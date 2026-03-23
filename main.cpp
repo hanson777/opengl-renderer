@@ -1,12 +1,10 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "glm/gtc/type_ptr.hpp"
 #include "shader/shader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "libs/stb_image.h"
 #include "camera/camera.h"
 #include "window/window.h"
 #include "model/model.h"
