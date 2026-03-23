@@ -32,6 +32,10 @@ void Camera::processKeyboard(Direction d, float deltaTime) {
             m_pos -= m_right * velocity;
         if (d == Right)
             m_pos += m_right * velocity;
+        if (d == Up) 
+            m_pos.y += velocity;
+        if (d == Down)
+            m_pos.y -= velocity;
 }
 
 void Camera::processMouseMovement(float xoffset, float yoffset) {

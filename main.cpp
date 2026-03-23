@@ -22,8 +22,9 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 Camera camera(cameraPos, cameraUp);
+
+glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 1.0f);
 
 void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     if (firstMouse) {
@@ -55,6 +56,10 @@ void processInput(GLFWwindow* window) {
         camera.processKeyboard(Camera::Left, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.processKeyboard(Camera::Right, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.processKeyboard(Camera::Up, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.processKeyboard(Camera::Down, deltaTime);
 }
 
 int main() {
@@ -186,21 +191,29 @@ int main() {
         0.5f,
 
     };
+    
+    uint32_t cubeVao, vbo;
+    glGenVertexArrays(1, &cubeVao);
+    glGenBuffers(1, &vbo);
 
-    // uint32_t vao;
-    // glGenVertexArrays(1, &vao);
-    // glBindVertexArray(vao);
-    //
-    // uint32_t buffer;
-    // glGenBuffers(1, &buffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //
-    // glEnableVertexAttribArray(0);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    Shader shader("shaders/shader.vert", "shaders/shader.frag");
+    glBindVertexArray(cubeVao);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    glEnableVertexAttribArray(0);
+
+    uint32_t lightVao;
+    glGenVertexArrays(1, &lightVao);
+    glBindVertexArray(lightVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    glEnableVertexAttribArray(0);
+
+    Shader lightTargetShader("shaders/lightTarget.vert", "shaders/lightTarget.frag");
+    Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
     Model buddha("obj/buddha.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
@@ -209,24 +222,34 @@ int main() {
         lastFrame = currentFrame;
         processInput(window.window());
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.use();
         
-        buddha.draw(shader);
-
         glm::mat4 view = camera.view();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::mat4(1.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        lightSourceShader.use();
+        lightSourceShader.setMat4("projection", projection);
+        lightSourceShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        lightSourceShader.setMat4("model", model);
 
-        int modelLoc = glGetUniformLocation(shader.id(), "model");
-        int viewLoc = glGetUniformLocation(shader.id(), "view");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        shader.setMat4("projection", projection);
+        glBindVertexArray(lightVao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        lightTargetShader.use();
+        lightTargetShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+        lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        lightTargetShader.setMat4("projection", projection);
+        lightTargetShader.setMat4("view", view);
+        lightTargetShader.setMat4("model", model);
+        buddha.draw(lightTargetShader);
 
         window.endFrame();
     }

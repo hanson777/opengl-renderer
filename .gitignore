@@ -6,3 +6,4 @@ obj/
 .vs/
 .idea/
 compile_commands.json
+libs/

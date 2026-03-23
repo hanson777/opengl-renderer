@@ -2,7 +2,7 @@
 
 class Camera {
   public:
-    enum Direction { Forward, Backward, Left, Right };
+    enum Direction { Forward, Backward, Left, Right, Up, Down};
     Camera(glm::vec3 pos, glm::vec3 up);
     void processKeyboard(Direction d, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset);
