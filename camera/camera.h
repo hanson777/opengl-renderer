@@ -8,6 +8,7 @@ class Camera {
     void processMouseMovement(float xoffset, float yoffset);
     void processMouseScroll(float yoffset);
     glm::mat4 view();
+    glm::vec3 position() { return m_pos; }
   private:
     void updateCameraVectors();
     glm::vec3 m_pos;

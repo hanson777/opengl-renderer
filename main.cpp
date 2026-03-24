@@ -22,7 +22,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 Camera camera(cameraPos, cameraUp);
 
-glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 1.0f);
+glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
 
 void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     if (firstMouse) {
@@ -67,128 +67,48 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     float vertices[] = {
-        // positions
-        // front face
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-        // back face
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-        // left face
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-        // right face
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-        // bottom face
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-        // top face
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.5f,
-
-    };
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+};
     
     uint32_t cubeVao, vbo;
     glGenVertexArrays(1, &cubeVao);
@@ -198,8 +118,12 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindVertexArray(cubeVao);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     uint32_t lightVao;
     glGenVertexArrays(1, &lightVao);
@@ -207,12 +131,14 @@ int main() {
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     Shader lightTargetShader("shaders/lightTarget.vert", "shaders/lightTarget.frag");
     Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
-    Model buddha("obj/buddha.obj");
+    // Model buddha("obj/buddha.obj");
+    // Model bmw("obj/bmw/bmw.obj");
+    Model bunny("obj/bunny.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
         float currentFrame = glfwGetTime();
@@ -229,25 +155,38 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         lightSourceShader.use();
-        lightSourceShader.setMat4("projection", projection);
-        lightSourceShader.setMat4("view", view);
+
+        float t = glfwGetTime();
+        float r = 1.5f;
+        lightPos = glm::vec3(sin(t) * 1.5f, 1.0f, cos(t) * 1.5f); 
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightSourceShader.setMat4("model", model);
+        lightSourceShader.setMat4("projection", projection);
+        lightSourceShader.setMat4("view", view);
 
         glBindVertexArray(lightVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         lightTargetShader.use();
-        lightTargetShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+
+        lightTargetShader.setVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
         lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+        lightTargetShader.setVec3("lightPos", lightPos);
+
         model = glm::mat4(1.0f);
         model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
-        buddha.draw(lightTargetShader);
+        lightTargetShader.setVec3("viewPos", camera.position());
+        // buddha.draw(lightTargetShader);
+        // bmw.draw(lightTargetShader);
+        bunny.draw(lightTargetShader);
+
+        // glBindVertexArray(cubeVao);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
         window.endFrame();
     }
