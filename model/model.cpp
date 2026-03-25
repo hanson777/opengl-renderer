@@ -2,6 +2,7 @@
 #include <tiny_obj_loader.h>
 #include "model.h"
 #include <iostream>
+#include <unordered_map>
 
 Model::Model(const std::string& path) {
     loadModel(path);

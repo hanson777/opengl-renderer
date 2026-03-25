@@ -6,12 +6,7 @@ class Window {
     Window(int width, int height, const char* title);
     void beginFrame();
     void endFrame();
-    GLFWwindow* window(); 
-    int height() const;
-    int width() const;
+    GLFWwindow* window() { return m_window; };
   private:
     GLFWwindow* m_window;
-    int m_width;
-    int m_height;
-    bool m_shouldClose;
 };

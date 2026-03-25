@@ -62,6 +62,7 @@ void processInput(GLFWwindow* window) {
 
 int main() {
     Window window(SCR_WIDTH, SCR_HEIGHT, "hi");
+    glfwMaximizeWindow(window.window());
     glfwSetCursorPosCallback(window.window(), mouseCallback);
 
     glEnable(GL_DEPTH_TEST);
@@ -138,7 +139,8 @@ int main() {
     Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
     // Model buddha("obj/buddha.obj");
     // Model bmw("obj/bmw/bmw.obj");
-    Model bunny("obj/bunny.obj");
+    // Model bunny("obj/bunny.obj");
+    Model erato("obj/erato/erato.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
         float currentFrame = glfwGetTime();
@@ -184,14 +186,14 @@ int main() {
         lightTargetShader.setVec3("lightPos", lightPos);
 
         model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.1f));
         // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.position());
-        // buddha.draw(lightTargetShader);
-        // bmw.draw(lightTargetShader);
-        bunny.draw(lightTargetShader);
+        
+        erato.draw(lightTargetShader);
 
         // glBindVertexArray(cubeVao);
         // glDrawArrays(GL_TRIANGLES, 0, 36);

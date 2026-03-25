@@ -35,5 +35,3 @@ void Window::beginFrame() {
 void Window::endFrame() {
     glfwSwapBuffers(m_window);
 }
-
-GLFWwindow* Window::window() { return m_window; }
