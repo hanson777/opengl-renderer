@@ -19,7 +19,7 @@ void main() {
   vec3 diffuse = diff * lightColor;
 
   float specularStrength = 0.5f;
-  vec3 viewDir = viewPos - fragPos;
+  vec3 viewDir = normalize(viewPos - fragPos);
   vec3 reflectDir = reflect(-lightDir, normal);
   // num at the end is "shininess" value
   float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32);

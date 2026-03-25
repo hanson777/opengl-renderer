@@ -22,7 +22,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 Camera camera(cameraPos, cameraUp);
 
-glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 lightPos = glm::vec3(3.0f, 2.0f, 1.0f);
 
 void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     if (firstMouse) {
@@ -160,11 +160,12 @@ int main() {
 
         float t = glfwGetTime();
         float r = 1.5f;
-        float b = 5.0f;
-        lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
+        float b = 0.5f;
+        lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+        lightPos = glm::vec3(sin(b*t) * r, 3.0f, cos(b*t) * r); 
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.5f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightSourceShader.setMat4("model", model);
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
@@ -181,7 +182,7 @@ int main() {
 
         lightTargetShader.use();
 
-        lightTargetShader.setVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
+        lightTargetShader.setVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
         lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
         lightTargetShader.setVec3("lightPos", lightPos);
 

@@ -14,8 +14,7 @@ void Model::loadModel(const std::string& path) {
     std::vector<tinyobj::material_t> materials;
     std::string err;
 
-    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str());
-    if (!success) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str())) {
         std::cout << "[ERROR::MODEL] " << err << std::endl;
         return;
     }
@@ -23,7 +22,6 @@ void Model::loadModel(const std::string& path) {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
 
-    // Use a packed struct as key instead of slow string concatenation
     struct IndexKey {
         int v, n, t;
         bool operator==(const IndexKey& o) const {
