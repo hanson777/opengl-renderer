@@ -9,8 +9,8 @@
 #include "window/window.h"
 #include "model/model.h"
 
-constexpr int SCR_WIDTH = 800;
-constexpr int SCR_HEIGHT = 600;
+constexpr int SCR_WIDTH = 1920;
+constexpr int SCR_HEIGHT = 1080;
 
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -152,16 +152,17 @@ int main() {
         
         glm::mat4 view = camera.view();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         lightSourceShader.use();
 
         float t = glfwGetTime();
         float r = 1.5f;
-        lightPos = glm::vec3(sin(t) * 1.5f, 1.0f, cos(t) * 1.5f); 
+        float b = 5.0f;
+        lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(0.5f)); // a smaller cube
         lightSourceShader.setMat4("model", model);
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
@@ -169,14 +170,21 @@ int main() {
         glBindVertexArray(lightVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // lightPos = glm::vec3(sin(b*t) * r, cos(b*t) * r, 0.0f);
+        // model = glm::mat4(1.0f);
+        // model = glm::translate(model, lightPos);
+        // model = glm::scale(model, glm::vec3(0.5f));
+        // lightSourceShader.setMat4("model", model);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+
         lightTargetShader.use();
 
-        lightTargetShader.setVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
+        lightTargetShader.setVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
         lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
         lightTargetShader.setVec3("lightPos", lightPos);
 
         model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
