@@ -4,15 +4,17 @@
 #include <vector>
 #include "../../shader/shader.h"
 
+enum class TextureType { Diffuse, Specular, Normal, Ambient };
+
 struct Vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texCoords;
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 texCoords;
 };
 
 struct Texture {
-    uint32_t id;
-    std::string type;
+	uint32_t id;
+	TextureType type;
 };
 
 class Mesh {
@@ -24,6 +26,8 @@ class Mesh {
     Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
     void draw(Shader& shader);
   private:
-    uint32_t m_vao, m_vbo, m_ebo;
+    uint32_t m_vao;
+    uint32_t m_vbo;
+    uint32_t m_ebo;
     void setupMesh();
 };

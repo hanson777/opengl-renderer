@@ -1,11 +1,20 @@
+#define STB_IMAGE_IMPLEMENTATION
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
+#include <stb_image.h>
 #include "model.h"
 #include <iostream>
 #include <unordered_map>
+#include <glad/glad.h>
+#include <chrono>
 
 Model::Model(const std::string& path) {
+	auto start = std::chrono::high_resolution_clock::now();
+
     loadModel(path);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> elapsed = end - start;
+	std::cout << "Load time: " << elapsed.count() << "ms\n";
 }
 
 void Model::loadModel(const std::string& path) {
@@ -14,8 +23,11 @@ void Model::loadModel(const std::string& path) {
     std::vector<tinyobj::material_t> materials;
     std::string err;
 
-    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str());
-    if (!success) {
+    m_directory = path.substr(0, path.find_last_of("/\\")) + "/";
+    std::cout << "directory: " << m_directory << std::endl;
+	bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), m_directory.c_str());
+
+    if (!success || !err.empty()) {
         std::cout << "[ERROR::MODEL] " << err << std::endl;
         return;
     }
@@ -46,16 +58,16 @@ void Model::loadModel(const std::string& path) {
                 indices.push_back(it->second);
             } else {
                 Vertex v{};
-                v.position = { attrib.vertices[3 * index.vertex_index + 0],
+                v.position = { attrib.vertices[3 * index.vertex_index],
                                attrib.vertices[3 * index.vertex_index + 1],
                                attrib.vertices[3 * index.vertex_index + 2] };
                 if (index.normal_index >= 0) {
-                    v.normal = { attrib.normals[3 * index.normal_index + 0],
+                    v.normal = { attrib.normals[3 * index.normal_index],
                                  attrib.normals[3 * index.normal_index + 1],
                                  attrib.normals[3 * index.normal_index + 2] };
                 }
                 if (index.texcoord_index >= 0) {
-                    v.texCoords = { attrib.texcoords[2 * index.texcoord_index + 0],
+                    v.texCoords = { attrib.texcoords[2 * index.texcoord_index],
                                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
                 }
 
@@ -67,9 +79,82 @@ void Model::loadModel(const std::string& path) {
         }
     }
 
-    std::vector<Texture> textures;
+    std::vector<Texture> textures = loadMaterialTextures(materials);
+    std::cout << "material size: " << materials.size() << std::endl;
+    std::cout << "texture size: " << textures.size() << std::endl;
+
     Mesh mesh(vertices, indices, textures);
     m_meshes.push_back(mesh);
+}
+
+uint32_t createWhiteTexture() {
+	uint32_t id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+	unsigned char white[] = { 255, 255, 255, 255 };
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+	return id;
+}
+
+std::vector<Texture> Model::loadMaterialTextures(std::vector<tinyobj::material_t> materials) {
+    std::vector<Texture> textures;
+    for (auto& mat : materials) {
+        if (mat.diffuse_texname.empty()) {
+            textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
+            continue;
+        }
+        else if (!mat.diffuse_texname.empty()) {
+            textures.push_back(loadMaterialTexture(mat, TextureType::Diffuse));
+        }
+        else if (!mat.specular_texname.empty()) {
+            textures.push_back(loadMaterialTexture(mat, TextureType::Specular));
+        }
+    }
+    return textures;
+}
+
+Texture Model::loadMaterialTexture(tinyobj::material_t mat, TextureType type) {
+    std::string path;
+    if (type == TextureType::Diffuse) path = mat.diffuse_texname;
+    else if (type == TextureType::Specular) path = mat.specular_texname;
+
+    Texture texture;
+    texture.id = loadTextureFile(m_directory + path);
+    texture.type = type;
+    std::cout << "Loaded texture id: " << texture.id << " path: " << path << std::endl;
+    return texture;
+}
+
+uint32_t Model::loadTextureFile(std::string path) {
+    uint32_t textureId;
+    glGenTextures(1, &textureId);
+
+    int width, height, numComponents;
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &numComponents, 0);
+    if (!data) { 
+        std::cout << "[ERROR::MODEL] failed to load texture at path: " << path << std::endl; 
+        stbi_image_free(data);
+        return textureId;
+    }
+
+    GLenum format = GL_RGBA;
+    if (numComponents == 1) format = GL_RED;
+    else if (numComponents == 3) format = GL_RGB;
+    else if (numComponents == 4) format = GL_RGBA;
+
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	stbi_image_free(data);
+
+    std::cout << "textureId: " << textureId << std::endl;
+    return textureId;
 }
 
 void Model::draw(Shader& shader) {

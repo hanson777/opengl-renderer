@@ -4,7 +4,6 @@
 #include "shader/shader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
 #include "camera/camera.h"
 #include "window/window.h"
 #include "model/model.h"
@@ -23,6 +22,8 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 Camera camera(cameraPos, cameraUp);
 
 glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
 
 void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     if (firstMouse) {
@@ -67,6 +68,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 int main() {
     Window window(SCR_WIDTH, SCR_HEIGHT, "hi");
     glfwMaximizeWindow(window.window());
+	glfwSetFramebufferSizeCallback(window.window(), framebufferSizeCallback);
     glfwSetCursorPosCallback(window.window(), mouseCallback);
     glfwSetScrollCallback(window.window(), scrollCallback);
 
@@ -142,9 +144,8 @@ int main() {
 
     Shader lightTargetShader("shaders/lightTarget.vert", "shaders/lightTarget.frag");
     Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
-    // Model buddha("obj/buddha.obj");
-    // Model bmw("obj/bmw/bmw.obj");
-    // Model bunny("obj/bunny.obj");
+
+    Model suzanne("obj/suzanne/suzanne.obj");
     Model erato("obj/erato/erato.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
@@ -163,13 +164,14 @@ int main() {
 
         lightSourceShader.use();
 
-        float t = glfwGetTime();
-        float r = 1.5f;
-        float b = 5.0f;
-        lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
+        //float t = glfwGetTime();
+        //float r = 1.5f;
+        //float b = 5.0f;
+        //lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
+        lightPos = glm::vec3(1.0f, 1.5f, 1.0f);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.5f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(0.25f)); // a smaller cube
         lightSourceShader.setMat4("model", model);
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
@@ -177,31 +179,34 @@ int main() {
         glBindVertexArray(lightVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // lightPos = glm::vec3(sin(b*t) * r, cos(b*t) * r, 0.0f);
-        // model = glm::mat4(1.0f);
-        // model = glm::translate(model, lightPos);
-        // model = glm::scale(model, glm::vec3(0.5f));
-        // lightSourceShader.setMat4("model", model);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-
         lightTargetShader.use();
 
-        lightTargetShader.setVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
+        lightTargetShader.setVec3("objectColor", glm::vec3(0.76862745098f)); // Silver
         lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
         lightTargetShader.setVec3("lightPos", lightPos);
 
+        // Material properties
+        // lightTargetShader.setVec3("material.diffuse1", glm::vec3(0.50754f)); // (not needed if using mtl)
+        lightTargetShader.setVec3("material.specular", glm::vec3(0.508273f));
+        lightTargetShader.setFloat("material.shininess", 0.4f * 128.0f);
+
+        // Light properties
+        lightTargetShader.setVec3("light.ambient", glm::vec3(0.2f));
+        lightTargetShader.setVec3("light.diffuse", glm::vec3(1.0f));
+        lightTargetShader.setVec3("light.specular", glm::vec3(1.0f));
+
         model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(0.1f));
+        // model = glm::scale(model, glm::vec3(0.1f));
         // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.position());
-        
-        erato.draw(lightTargetShader);
 
-        // glBindVertexArray(cubeVao);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
+		/*glBindVertexArray(cubeVao);
+		glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+        suzanne.draw(lightTargetShader);
 
         window.endFrame();
     }
