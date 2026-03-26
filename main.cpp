@@ -21,7 +21,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 Camera camera(cameraPos, cameraUp);
 
-glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 lightPos = glm::vec3(3.0f, 2.0f, 1.0f);
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
 
