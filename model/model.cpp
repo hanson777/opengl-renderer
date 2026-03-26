@@ -49,9 +49,16 @@ void Model::loadModel(const std::string& path) {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
-    for (auto& shape : shapes) {
-        for (auto& index : shape.mesh.indices) {
-            IndexKey key{ index.vertex_index, index.normal_index, index.texcoord_index };
+	vertices.reserve(attrib.vertices.size() / 3);
+	indices.reserve(shapes[0].mesh.indices.size());
+	uniqueVertices.reserve(attrib.vertices.size() / 3);
+
+    std::cout << "Total face vertices: attrib.vertices.size()/3 " << attrib.vertices.size() / 3 << std::endl;
+	std::cout << "Total face indices: shapes[0].mesh.indices.size() " << shapes[0].mesh.indices.size() / 3 << std::endl;
+ 
+	for (auto& shape : shapes) {
+		for (auto& index : shape.mesh.indices) {
+			IndexKey key{ index.vertex_index, index.normal_index, index.texcoord_index };
 
             auto it = uniqueVertices.find(key);
             if (it != uniqueVertices.end()) {
@@ -72,12 +79,34 @@ void Model::loadModel(const std::string& path) {
                 }
 
                 uint32_t newIndex = static_cast<uint32_t>(vertices.size());
-                uniqueVertices[key] = newIndex;
-                vertices.push_back(v);
-                indices.push_back(newIndex);
+				uniqueVertices[key] = newIndex;
+				vertices.push_back(v);
+				indices.push_back(newIndex);
             }
-        }
-    }
+		}
+	}
+
+	/*for (const auto& shape : shapes) {
+		for (const auto& index : shape.mesh.indices) {
+			Vertex vertex{};
+			vertex.position = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+			vertex.normal = {
+				attrib.normals[3 * index.normal_index + 0],
+				attrib.normals[3 * index.normal_index + 1],
+				attrib.normals[3 * index.normal_index + 2]
+			};
+			vertex.texCoords = {
+				attrib.texcoords[2 * index.texcoord_index + 0],
+				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			};
+			vertices.push_back(vertex);
+			indices.push_back(indices.size());
+		}
+	}*/
 
     std::vector<Texture> textures = loadMaterialTextures(materials);
     std::cout << "material size: " << materials.size() << std::endl;
