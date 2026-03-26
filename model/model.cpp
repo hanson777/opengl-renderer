@@ -99,7 +99,9 @@ uint32_t createWhiteTexture() {
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
 	unsigned char white[] = { 255, 255, 255, 255 };
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return id;
 }
 
@@ -135,27 +137,26 @@ uint32_t Model::loadTextureFile(std::string path) {
     uint32_t textureId;
     glGenTextures(1, &textureId);
 
-    int width, height, numComponents;
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &numComponents, 0);
+    int width, height, numChannels;
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &numChannels, 0);
     if (!data) { 
         std::cout << "[ERROR::MODEL] failed to load texture at path: " << path << std::endl; 
         stbi_image_free(data);
         return textureId;
     }
 
-    GLenum format = GL_RGBA;
-    if (numComponents == 1) format = GL_RED;
-    else if (numComponents == 3) format = GL_RGB;
-    else if (numComponents == 4) format = GL_RGBA;
+    GLint internalFormat = (numChannels == 4) ? GL_RGBA8 : GL_RGB8; // How the GPU stores texture in VRAM
+    GLenum pixelFormat   = (numChannels == 4) ? GL_RGBA  : GL_RGB; // describes CPU-side data
 
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, pixelFormat, GL_UNSIGNED_BYTE, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);
 

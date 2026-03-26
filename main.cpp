@@ -145,8 +145,9 @@ int main() {
     Shader lightTargetShader("shaders/lightTarget.vert", "shaders/lightTarget.frag");
     Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
 
-    Model suzanne("obj/suzanne/suzanne.obj");
-    Model erato("obj/erato/erato.obj");
+    // Model suzanne("obj/suzanne/suzanne.obj");
+    // Model erato("obj/erato/erato.obj");
+    Model bunny("obj/bunny.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
         float currentFrame = glfwGetTime();
@@ -207,7 +208,8 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         //suzanne.draw(lightTargetShader);
-        erato.draw(lightTargetShader);
+        // erato.draw(lightTargetShader);
+        bunny.draw(lightTargetShader);
 
         window.endFrame();
     }
