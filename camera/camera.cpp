@@ -54,9 +54,11 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 void Camera::processMouseScroll(float yoffset) {
         m_zoom -= yoffset;
         m_zoom = std::clamp(m_zoom, 1.0f, 45.0f);
-    }
+        
 
-glm::mat4 Camera::view() {
+}
+
+glm::mat4 Camera::view() const {
     return glm::lookAt(m_pos, m_pos + m_front, m_up);
 }
 

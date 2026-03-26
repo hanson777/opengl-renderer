@@ -20,9 +20,6 @@ void Model::loadModel(const std::string& path) {
         return;
     }
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-
     // Use a packed struct as key instead of slow string concatenation
     struct IndexKey {
         int v, n, t;
@@ -35,7 +32,10 @@ void Model::loadModel(const std::string& path) {
             return ((size_t)k.v * 73856093) ^ ((size_t)k.n * 19349663) ^ ((size_t)k.t * 83492791);
         }
     };
+
     std::unordered_map<IndexKey, uint32_t, IndexKeyHash> uniqueVertices;
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
     for (auto& shape : shapes) {
         for (auto& index : shape.mesh.indices) {

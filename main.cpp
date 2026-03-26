@@ -60,10 +60,15 @@ void processInput(GLFWwindow* window) {
         camera.processKeyboard(Camera::Down, deltaTime);
 }
 
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    camera.processMouseScroll(yoffset);
+}
+
 int main() {
     Window window(SCR_WIDTH, SCR_HEIGHT, "hi");
     glfwMaximizeWindow(window.window());
     glfwSetCursorPosCallback(window.window(), mouseCallback);
+    glfwSetScrollCallback(window.window(), scrollCallback);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -154,7 +159,7 @@ int main() {
         
         glm::mat4 view = camera.view();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.fov()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         lightSourceShader.use();
 

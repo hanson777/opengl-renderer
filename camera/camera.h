@@ -7,8 +7,9 @@ class Camera {
     void processKeyboard(Direction d, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset);
     void processMouseScroll(float yoffset);
-    glm::mat4 view();
-    glm::vec3 position() { return m_pos; }
+    glm::mat4 view() const;
+    glm::vec3 position() const { return m_pos; }
+    float fov() const { return m_zoom; }
   private:
     void updateCameraVectors();
     glm::vec3 m_pos;
