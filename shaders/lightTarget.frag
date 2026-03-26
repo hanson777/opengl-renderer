@@ -1,7 +1,7 @@
 #version 410 core
 struct Material {
 	sampler2D diffuse1; // diffuseN for texture loading
-	vec3 specular;
+	sampler2D specular1; // specularN for texture loading
 	float shininess;
 };
 
@@ -40,7 +40,7 @@ void main() {
   vec3 viewDir = normalize(viewPos - fragPos);
   vec3 reflectDir = reflect(-lightDir, normal);
   float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
-  vec3 specular = light.specular * (spec * material.specular);
+  vec3 specular = light.specular * spec * vec3(texture(material.specular1, texCoords));
 
   vec3 result = (ambient + diffuse + specular);
   FragColor = vec4(result, 1.0);

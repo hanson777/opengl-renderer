@@ -187,7 +187,7 @@ int main() {
 
         // Material properties
         // lightTargetShader.setVec3("material.diffuse1", glm::vec3(0.50754f)); // (not needed if using mtl)
-        lightTargetShader.setVec3("material.specular", glm::vec3(0.508273f));
+        // lightTargetShader.setVec3("material.specular", glm::vec3(0.508273f)); // (not needed if using mtl)
         lightTargetShader.setFloat("material.shininess", 0.4f * 128.0f);
 
         // Light properties
@@ -206,7 +206,8 @@ int main() {
 		/*glBindVertexArray(cubeVao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
-        suzanne.draw(lightTargetShader);
+        //suzanne.draw(lightTargetShader);
+        erato.draw(lightTargetShader);
 
         window.endFrame();
     }

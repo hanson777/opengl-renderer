@@ -53,8 +53,8 @@ void Model::loadModel(const std::string& path) {
 	indices.reserve(shapes[0].mesh.indices.size());
 	uniqueVertices.reserve(attrib.vertices.size() / 3);
 
-    std::cout << "Total face vertices: attrib.vertices.size()/3 " << attrib.vertices.size() / 3 << std::endl;
-	std::cout << "Total face indices: shapes[0].mesh.indices.size() " << shapes[0].mesh.indices.size() / 3 << std::endl;
+    std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;
+	std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
  
 	for (auto& shape : shapes) {
 		for (auto& index : shape.mesh.indices) {
@@ -86,28 +86,6 @@ void Model::loadModel(const std::string& path) {
 		}
 	}
 
-	/*for (const auto& shape : shapes) {
-		for (const auto& index : shape.mesh.indices) {
-			Vertex vertex{};
-			vertex.position = {
-				attrib.vertices[3 * index.vertex_index + 0],
-				attrib.vertices[3 * index.vertex_index + 1],
-				attrib.vertices[3 * index.vertex_index + 2]
-			};
-			vertex.normal = {
-				attrib.normals[3 * index.normal_index + 0],
-				attrib.normals[3 * index.normal_index + 1],
-				attrib.normals[3 * index.normal_index + 2]
-			};
-			vertex.texCoords = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-			};
-			vertices.push_back(vertex);
-			indices.push_back(indices.size());
-		}
-	}*/
-
     std::vector<Texture> textures = loadMaterialTextures(materials);
     std::cout << "material size: " << materials.size() << std::endl;
     std::cout << "texture size: " << textures.size() << std::endl;
@@ -127,18 +105,17 @@ uint32_t createWhiteTexture() {
 
 std::vector<Texture> Model::loadMaterialTextures(std::vector<tinyobj::material_t> materials) {
     std::vector<Texture> textures;
-    for (auto& mat : materials) {
-        if (mat.diffuse_texname.empty()) {
-            textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
-            continue;
-        }
-        else if (!mat.diffuse_texname.empty()) {
-            textures.push_back(loadMaterialTexture(mat, TextureType::Diffuse));
-        }
-        else if (!mat.specular_texname.empty()) {
-            textures.push_back(loadMaterialTexture(mat, TextureType::Specular));
-        }
-    }
+	for (auto& mat : materials) {
+		if (!mat.diffuse_texname.empty())
+			textures.push_back(loadMaterialTexture(mat, TextureType::Diffuse));
+		else
+			textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
+
+		if (!mat.specular_texname.empty())
+			textures.push_back(loadMaterialTexture(mat, TextureType::Specular));
+		else
+			textures.push_back({ createWhiteTexture(), TextureType::Specular });
+	}
     return textures;
 }
 
