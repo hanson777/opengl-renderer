@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "shader/shader.h"
 #include <glad/glad.h>
+#include <iostream>
 #include <GLFW/glfw3.h>
 #include "camera/camera.h"
 #include "window/window.h"
@@ -22,8 +23,6 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 Camera camera(cameraPos, cameraUp);
 
 glm::vec3 lightPos = glm::vec3(3.0f, 2.0f, 1.0f);
-
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
 
 void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     if (firstMouse) {
@@ -68,86 +67,16 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 int main() {
     Window window(SCR_WIDTH, SCR_HEIGHT, "hi");
     glfwMaximizeWindow(window.window());
-	glfwSetFramebufferSizeCallback(window.window(), framebufferSizeCallback);
     glfwSetCursorPosCallback(window.window(), mouseCallback);
     glfwSetScrollCallback(window.window(), scrollCallback);
 
     glEnable(GL_DEPTH_TEST);
 
-    float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+	Shader lightTargetShader("shaders/blankShader.vert", "shaders/blankShader.frag");
+    Shader lightSourceShader("shaders/phongShader.vert", "shaders/phongShader.frag");
 
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-};
-    
-    uint32_t cubeVao, vbo;
-    glGenVertexArrays(1, &cubeVao);
-    glGenBuffers(1, &vbo);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(cubeVao);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    uint32_t lightVao;
-    glGenVertexArrays(1, &lightVao);
-    glBindVertexArray(lightVao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    Shader lightTargetShader("shaders/lightTarget.vert", "shaders/lightTarget.frag");
-    Shader lightSourceShader("shaders/lightSource.vert", "shaders/lightSource.frag");
-
-    // Model suzanne("obj/suzanne/suzanne.obj");
-    // Model erato("obj/erato/erato.obj");
-    Model bunny("obj/bunny.obj");
+    Model cube("obj/cube/cube.obj");
+    Model suzanne("obj/suzanne/suzanne.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
         float currentFrame = glfwGetTime();
@@ -155,8 +84,8 @@ int main() {
         lastFrame = currentFrame;
         processInput(window.window());
 
-        // glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
+        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         glm::mat4 view = camera.view();
@@ -177,8 +106,7 @@ int main() {
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
 
-        glBindVertexArray(lightVao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        cube.draw(lightSourceShader, false);
 
         lightTargetShader.use();
 
@@ -197,19 +125,12 @@ int main() {
         lightTargetShader.setVec3("light.specular", glm::vec3(1.0f));
 
         model = glm::mat4(1.0f);
-        // model = glm::scale(model, glm::vec3(0.1f));
-        // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.position());
 
-		/*glBindVertexArray(cubeVao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);*/
-
-        //suzanne.draw(lightTargetShader);
-        // erato.draw(lightTargetShader);
-        bunny.draw(lightTargetShader);
+		suzanne.draw(lightTargetShader, true);
 
         window.endFrame();
     }

@@ -5,7 +5,7 @@
 class Model {
 public:
     Model(const std::string& path);
-    void draw(Shader& shader);
+    void draw(Shader& shader, bool loadMats);
 
 private:
     std::vector<Mesh> m_meshes;

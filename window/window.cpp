@@ -14,14 +14,19 @@ Window::Window(int width, int height, const char* title) {
         std::cout << "[ERROR::WINDOW] failed to create GLFW window" << std::endl;
         glfwTerminate();
     }
-    m_window = window;
-
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "[ERROR::WINDOW] failed to initialize GLAD" << std::endl;
+        return;
     }
+
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        glViewport(0, 0, width, height);
+    });
+
+    m_window = window;
 }
 
 void Window::beginFrame() {

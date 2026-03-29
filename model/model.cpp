@@ -146,7 +146,7 @@ uint32_t Model::loadTextureFile(std::string path) {
     }
 
     GLint internalFormat = (numChannels == 4) ? GL_RGBA8 : GL_RGB8; // How the GPU stores texture in VRAM
-    GLenum pixelFormat   = (numChannels == 4) ? GL_RGBA  : GL_RGB; // describes CPU-side data
+    GLenum pixelFormat   = (numChannels == 4) ? GL_RGBA  : GL_RGB;  // describes CPU-side data
 
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, pixelFormat, GL_UNSIGNED_BYTE, data);
@@ -164,8 +164,8 @@ uint32_t Model::loadTextureFile(std::string path) {
     return textureId;
 }
 
-void Model::draw(Shader& shader) {
+void Model::draw(Shader& shader, bool loadMats) {
     for (Mesh& mesh : m_meshes) {
-        mesh.draw(shader);
+        mesh.draw(shader, loadMats);
     }
 }

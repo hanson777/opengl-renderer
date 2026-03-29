@@ -39,26 +39,29 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 } 
 
-void Mesh::draw(Shader& shader) {
-    uint32_t diffuseNum = 1;
-    uint32_t specularNum = 1;
-    for (uint32_t i = 0; i < m_textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-		// retrieve texture number (the N in typeN)
-		std::string number;
-		TextureType name = m_textures[i].type;
-        std::string strName;
-        if (name == TextureType::Diffuse) {
-			number = std::to_string(diffuseNum++);
-			strName = "diffuse";
-        }
-        else if (name == TextureType::Specular) {
-            number = std::to_string(specularNum++);
-            strName = "specular";
-        }
-		shader.setInt(("material." + strName + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+void Mesh::draw(Shader& shader, bool loadMats) {
+    if (loadMats) {
+		uint32_t diffuseNum = 1;
+		uint32_t specularNum = 1;
+		for (uint32_t i = 0; i < m_textures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
+			// retrieve texture number (the N in typeN)
+			std::string number;
+			TextureType name = m_textures[i].type;
+			std::string strName;
+			if (name == TextureType::Diffuse) {
+				number = std::to_string(diffuseNum++);
+				strName = "diffuse";
+			}
+			else if (name == TextureType::Specular) {
+				number = std::to_string(specularNum++);
+				strName = "specular";
+			}
+			shader.setInt(("material." + strName + number).c_str(), i);
+			glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+		}
     }
+
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

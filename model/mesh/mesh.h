@@ -24,7 +24,7 @@ class Mesh {
     std::vector<Texture> m_textures;
 
     Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
-    void draw(Shader& shader);
+    void draw(Shader& shader, bool loadMats);
   private:
     uint32_t m_vao;
     uint32_t m_vbo;
