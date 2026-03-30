@@ -27,19 +27,13 @@ struct std::hash<Vertex> {
     }
 };
 
-struct Texture {
-	uint32_t id;
-	TextureType type;
-};
-
 class Mesh {
   public:
     std::vector<Vertex> m_vertices;
     std::vector<uint32_t> m_indices;
-    std::vector<Texture> m_textures;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
-    void draw(Shader& shader, bool loadMats);
+    Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
+    void draw(Shader& shader);
   private:
     uint32_t m_vao;
     uint32_t m_vbo;

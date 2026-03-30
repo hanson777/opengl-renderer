@@ -130,7 +130,7 @@ int main() {
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.position());
 
-		suzanne.draw(lightTargetShader, true);
+		suzanne.draw(lightTargetShader, false);
 
         window.endFrame();
     }

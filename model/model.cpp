@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
-#define TINYOBJLOADER_IMPLEMENTATION
 #include <stb_image.h>
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 #include "model.h"
 #include <iostream>
 #include <unordered_map>
@@ -59,93 +60,21 @@ void Model::loadModel(const std::string& path) {
                                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
                 }
                 if (!uniqueVertices.contains(v)) { 
-                   uniqueVertices[v] = static_cast<uint32_t>(vertices.size());
+                   uniqueVertices[v] = vertices.size();
                    vertices.push_back(v);
                 }
                 indices.push_back(uniqueVertices[v]);
 		    }
 	    }
 
-    std::vector<Texture> textures = loadMaterialTextures(materials);
     std::cout << "material size: " << materials.size() << std::endl;
-    std::cout << "texture size: " << textures.size() << std::endl;
 
-    Mesh mesh(vertices, indices, textures);
+    Mesh mesh(vertices, indices);
     m_meshes.push_back(mesh);
 }
 
-uint32_t createWhiteTexture() {
-	uint32_t id;
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
-	unsigned char white[] = { 255, 255, 255, 255 };
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	return id;
-}
-
-std::vector<Texture> Model::loadMaterialTextures(std::vector<tinyobj::material_t> materials) {
-    std::vector<Texture> textures;
-	for (auto& mat : materials) {
-		if (!mat.diffuse_texname.empty())
-			textures.push_back(loadMaterialTexture(mat, TextureType::Diffuse));
-		// else
-		// 	textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
-		//
-		if (!mat.specular_texname.empty())
-			textures.push_back(loadMaterialTexture(mat, TextureType::Specular));
-		// else
-		// 	textures.push_back({ createWhiteTexture(), TextureType::Specular });
-	}
-    return textures;
-}
-
-Texture Model::loadMaterialTexture(tinyobj::material_t mat, TextureType type) {
-    std::string path;
-    if (type == TextureType::Diffuse) path = mat.diffuse_texname;
-    else if (type == TextureType::Specular) path = mat.specular_texname;
-
-    Texture texture;
-    texture.id = loadTextureFile(m_directory + path);
-    texture.type = type;
-    std::cout << "Loaded texture id: " << texture.id << " path: " << path << std::endl;
-    return texture;
-}
-
-uint32_t Model::loadTextureFile(std::string path) {
-    uint32_t textureId;
-    glGenTextures(1, &textureId);
-
-    int width, height, numChannels;
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &numChannels, 0);
-    if (!data) { 
-        std::cout << "[ERROR::MODEL] failed to load texture at path: " << path << std::endl; 
-        stbi_image_free(data);
-        return textureId;
-    }
-
-    GLint internalFormat = (numChannels == 4) ? GL_RGBA8 : GL_RGB8; // How the GPU stores texture in VRAM
-    GLenum pixelFormat   = (numChannels == 4) ? GL_RGBA  : GL_RGB;  // describes CPU-side data
-
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, pixelFormat, GL_UNSIGNED_BYTE, data);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
-
-    std::cout << "textureId: " << textureId << std::endl;
-    return textureId;
-}
-
-void Model::draw(Shader& shader, bool loadMats) {
+void Model::draw(Shader& shader) {
     for (Mesh& mesh : m_meshes) {
-        mesh.draw(shader, loadMats);
+        mesh.draw(shader);
     }
 }
