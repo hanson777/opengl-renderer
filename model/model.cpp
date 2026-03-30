@@ -32,20 +32,7 @@ void Model::loadModel(const std::string& path) {
         return;
     }
 
-    // Use a packed struct as key instead of slow string concatenation
-    struct IndexKey {
-        int v, n, t;
-        bool operator==(const IndexKey& o) const {
-            return v == o.v && n == o.n && t == o.t;
-        }
-    };
-    struct IndexKeyHash {
-        size_t operator()(const IndexKey& k) const {
-            return ((size_t)k.v * 73856093) ^ ((size_t)k.n * 19349663) ^ ((size_t)k.t * 83492791);
-        }
-    };
-
-    std::unordered_map<IndexKey, uint32_t, IndexKeyHash> uniqueVertices;
+    std::unordered_map<Vertex, uint32_t> uniqueVertices;
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -56,15 +43,9 @@ void Model::loadModel(const std::string& path) {
     std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;
 	std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
  
-	for (auto& shape : shapes) {
-		for (auto& index : shape.mesh.indices) {
-			IndexKey key{ index.vertex_index, index.normal_index, index.texcoord_index };
-
-            auto it = uniqueVertices.find(key);
-            if (it != uniqueVertices.end()) {
-                indices.push_back(it->second);
-            } else {
-                Vertex v{};
+	for (const auto& shape : shapes) {
+		for (const auto& index : shape.mesh.indices) {
+                Vertex v;
                 v.position = { attrib.vertices[3 * index.vertex_index],
                                attrib.vertices[3 * index.vertex_index + 1],
                                attrib.vertices[3 * index.vertex_index + 2] };
@@ -77,14 +58,13 @@ void Model::loadModel(const std::string& path) {
                     v.texCoords = { attrib.texcoords[2 * index.texcoord_index],
                                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
                 }
-
-                uint32_t newIndex = static_cast<uint32_t>(vertices.size());
-				uniqueVertices[key] = newIndex;
-				vertices.push_back(v);
-				indices.push_back(newIndex);
-            }
-		}
-	}
+                if (!uniqueVertices.contains(v)) { 
+                   uniqueVertices[v] = static_cast<uint32_t>(vertices.size());
+                   vertices.push_back(v);
+                }
+                indices.push_back(uniqueVertices[v]);
+		    }
+	    }
 
     std::vector<Texture> textures = loadMaterialTextures(materials);
     std::cout << "material size: " << materials.size() << std::endl;
@@ -110,13 +90,13 @@ std::vector<Texture> Model::loadMaterialTextures(std::vector<tinyobj::material_t
 	for (auto& mat : materials) {
 		if (!mat.diffuse_texname.empty())
 			textures.push_back(loadMaterialTexture(mat, TextureType::Diffuse));
-		else
-			textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
-
+		// else
+		// 	textures.push_back({ createWhiteTexture(), TextureType::Diffuse });
+		//
 		if (!mat.specular_texname.empty())
 			textures.push_back(loadMaterialTexture(mat, TextureType::Specular));
-		else
-			textures.push_back({ createWhiteTexture(), TextureType::Specular });
+		// else
+		// 	textures.push_back({ createWhiteTexture(), TextureType::Specular });
 	}
     return textures;
 }
