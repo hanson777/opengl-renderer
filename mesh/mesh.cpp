@@ -1,6 +1,5 @@
 #include "mesh.h"
 #include <glad/glad.h>
-#include <iostream>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices) {
    m_vertices = vertices;

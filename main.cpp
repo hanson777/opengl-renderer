@@ -106,7 +106,7 @@ int main() {
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
 
-        cube.draw(lightSourceShader, false);
+        cube.draw(lightSourceShader);
 
         lightTargetShader.use();
 
@@ -130,7 +130,7 @@ int main() {
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.position());
 
-		suzanne.draw(lightTargetShader, false);
+		suzanne.draw(lightTargetShader);
 
         window.endFrame();
     }

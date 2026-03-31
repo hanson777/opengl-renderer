@@ -61,8 +61,10 @@ add_executable(${PROJECT_NAME}
     shader/shader.cpp
     camera/camera.cpp
     window/window.cpp
-    model/mesh/mesh.cpp
     model/model.cpp
+    mesh/mesh.cpp
+    material/material.cpp
+    texture/texture.cpp
 )
 
 # =============================================================================

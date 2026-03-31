@@ -1,5 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 #include "model.h"
@@ -25,7 +23,7 @@ void Model::loadModel(const std::string& path) {
     std::string err;
 
     m_directory = path.substr(0, path.find_last_of("/\\")) + "/";
-    std::cout << "directory: " << m_directory << std::endl;
+    std::cout << "Directory: " << m_directory << std::endl;
 	bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), m_directory.c_str());
 
     if (!success || !err.empty()) {
@@ -67,7 +65,7 @@ void Model::loadModel(const std::string& path) {
 		    }
 	    }
 
-    std::cout << "material size: " << materials.size() << std::endl;
+    std::cout << "Material size: " << materials.size() << std::endl;
 
     Mesh mesh(vertices, indices);
     m_meshes.push_back(mesh);

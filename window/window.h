@@ -7,6 +7,7 @@ class Window {
     void beginFrame();
     void endFrame();
     GLFWwindow* window() { return m_window; };
+
   private:
     GLFWwindow* m_window;
 };

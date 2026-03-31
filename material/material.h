@@ -1,5 +1,4 @@
 #include <string>
-#include <glad/glad.h>
 
 class Material {
   public:
@@ -7,6 +6,6 @@ class Material {
 
   private:
     std::string m_name;
-    GLuint m_alb;
-    GLuint m_nrm;
+    uint32_t m_alb;
+    uint32_t m_nrm;
 };
