@@ -5,15 +5,15 @@ class Camera {
     Camera(glm::vec3 pos, glm::vec3 up);
     enum Direction { Forward, Backward, Left, Right, Up, Down};
 
-    void processKeyboard(Direction d, float deltaTime);
-    void processMouseMovement(float xoffset, float yoffset);
-    void processMouseScroll(float yoffset);
-    glm::mat4 view() const;
-    glm::vec3 position() const { return m_pos; }
-    float fov() const { return m_zoom; }
+    void ProcessKeyboard(Direction d, float deltaTime);
+    void ProcessMouseMovement(float xoffset, float yoffset);
+    void ProcessMouseScroll(float yoffset);
+    glm::mat4 View() const;
+    glm::vec3 Position() const { return m_pos; }
+    float Fov() const { return m_zoom; }
 
   private:
-    void updateCameraVectors();
+    void UpdateCameraVectors();
 
     glm::vec3 m_pos;
     glm::vec3 m_up;

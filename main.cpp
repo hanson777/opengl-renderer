@@ -39,7 +39,7 @@ void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     lastX = xpos;
     lastY = ypos;
 
-    camera.processMouseMovement(xoffset, yoffset);
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void processInput(GLFWwindow* window) {
@@ -47,21 +47,21 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Forward, deltaTime);
+        camera.ProcessKeyboard(Camera::Forward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Backward, deltaTime);
+        camera.ProcessKeyboard(Camera::Backward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Left, deltaTime);
+        camera.ProcessKeyboard(Camera::Left, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Right, deltaTime);
+        camera.ProcessKeyboard(Camera::Right, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Up, deltaTime);
+        camera.ProcessKeyboard(Camera::Up, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.processKeyboard(Camera::Down, deltaTime);
+        camera.ProcessKeyboard(Camera::Down, deltaTime);
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-    camera.processMouseScroll(yoffset);
+    camera.ProcessMouseScroll(yoffset);
 }
 
 int main() {
@@ -72,8 +72,8 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-	Shader lightTargetShader("shaders/blankShader.vert", "shaders/blankShader.frag");
-    Shader lightSourceShader("shaders/phongShader.vert", "shaders/phongShader.frag");
+	Shader lightTargetShader("shaders/phongShader.vert", "shaders/phongShader.frag");
+    Shader lightSourceShader("shaders/blankShader.vert", "shaders/blankShader.frag");
 
     Model cube("obj/cube/cube.obj");
     Model suzanne("obj/suzanne/suzanne.obj");
@@ -88,17 +88,17 @@ int main() {
         // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glm::mat4 view = camera.view();
+        glm::mat4 view = camera.View();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(camera.fov()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Fov()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         lightSourceShader.use();
 
-        //float t = glfwGetTime();
-        //float r = 1.5f;
-        //float b = 5.0f;
-        //lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
-        lightPos = glm::vec3(1.0f, 1.5f, 1.0f);
+        float t = glfwGetTime();
+        float r = 1.5f;
+        float b = 5.0f;
+        lightPos = glm::vec3(sin(b*t) * r, 1.0f, cos(b*t) * r); 
+        //lightPos = glm::vec3(1.0f, 1.5f, 1.0f);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.25f)); // a smaller cube
@@ -106,7 +106,7 @@ int main() {
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
 
-        cube.draw(lightSourceShader);
+        cube.Draw(lightSourceShader);
 
         lightTargetShader.use();
 
@@ -115,8 +115,8 @@ int main() {
         lightTargetShader.setVec3("lightPos", lightPos);
 
         // Material properties
-        // lightTargetShader.setVec3("material.diffuse1", glm::vec3(0.50754f)); // (not needed if using mtl)
-        // lightTargetShader.setVec3("material.specular", glm::vec3(0.508273f)); // (not needed if using mtl)
+        lightTargetShader.setVec3("material.diffuse1", glm::vec3(0.50754f)); // (not needed if using mtl)
+        lightTargetShader.setVec3("material.specular1", glm::vec3(0.508273f)); // (not needed if using mtl)
         lightTargetShader.setFloat("material.shininess", 0.4f * 128.0f);
 
         // Light properties
@@ -128,9 +128,9 @@ int main() {
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
-        lightTargetShader.setVec3("viewPos", camera.position());
+        lightTargetShader.setVec3("viewPos", camera.Position());
 
-		suzanne.draw(lightTargetShader);
+		suzanne.Draw(lightTargetShader);
 
         window.endFrame();
     }

@@ -2,7 +2,7 @@
 
 class Material {
   public:
-    void bind();
+    void Bind();
 
   private:
     std::string m_name;

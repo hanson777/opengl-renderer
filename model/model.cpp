@@ -9,14 +9,14 @@
 Model::Model(const std::string& path) {
 	auto start = std::chrono::high_resolution_clock::now();
 
-    loadModel(path);
+    LoadModel(path);
 
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> elapsed = end - start;
 	std::cout << "Load time: " << elapsed.count() << "ms\n";
 }
 
-void Model::loadModel(const std::string& path) {
+void Model::LoadModel(const std::string& path) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -71,8 +71,8 @@ void Model::loadModel(const std::string& path) {
     m_meshes.push_back(mesh);
 }
 
-void Model::draw(Shader& shader) {
+void Model::Draw(Shader& shader) {
     for (Mesh& mesh : m_meshes) {
-        mesh.draw(shader);
+        mesh.Draw(shader);
     }
 }

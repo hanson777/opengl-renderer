@@ -31,10 +31,11 @@ class Mesh {
     std::vector<uint32_t> m_indices;
 
     Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
-    void draw(Shader& shader);
+    void Draw(Shader& shader);
 
   private:
     uint32_t m_vao, m_vbo, m_ebo;
 
-    void setupMesh();
+    void SetupMesh();
+    void SetupMaterial();
 };
