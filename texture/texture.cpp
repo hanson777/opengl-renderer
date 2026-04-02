@@ -4,6 +4,7 @@
 #include <iostream>
 
 void Texture::Load(const std::string filename) {
+	std::cout << "Loading texture file " << filename << std::endl;
 	int width, height, ncomp;
 	uint8_t* data = stbi_load(filename.c_str(), &width, &height, &ncomp, 0);
 	if (!data) {
@@ -20,19 +21,20 @@ void Texture::Load(const std::string filename) {
 
 	BindTexture(data, format, width, height);
 	stbi_image_free(data);
-
-	m_width = width;
-	m_height = height;
 }
 
 void Texture::BindTexture(uint8_t* data, GLenum format, int width, int height) {
     glGenTextures(1, &m_id);
     glBindTexture(GL_TEXTURE_2D, m_id);
+	std::cout << "Texture ID: " << m_id << std::endl;
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

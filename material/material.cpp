@@ -3,7 +3,7 @@
 
 void Material::Bind() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_alb);
+    glBindTexture(GL_TEXTURE_2D, m_diffuseMap.Id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_nrm);
+    glBindTexture(GL_TEXTURE_2D, m_specularMap.Id());
 }

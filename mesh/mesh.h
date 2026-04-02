@@ -25,17 +25,14 @@ struct std::hash<Vertex> {
     }
 };
 
-class Mesh {
-  public:
-    std::vector<Vertex> m_vertices;
-    std::vector<uint32_t> m_indices;
+struct Mesh {
+      Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+    
+      uint32_t m_vao, m_vbo, m_ebo;
+      std::vector<Vertex> m_vertices;
+      std::vector<uint32_t> m_indices;
+      int m_materialId;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
-    void Draw(Shader& shader);
-
-  private:
-    uint32_t m_vao, m_vbo, m_ebo;
-
-    void SetupMesh();
-    void SetupMaterial();
+      void Draw(Shader& shader);
+      void Bind();
 };

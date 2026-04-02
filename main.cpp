@@ -76,7 +76,8 @@ int main() {
     Shader lightSourceShader("shaders/blankShader.vert", "shaders/blankShader.frag");
 
     Model cube("obj/cube/cube.obj");
-    Model suzanne("obj/suzanne/suzanne.obj");
+    // Model suzanne("obj/suzanne/suzanne.obj");
+    Model sponza("obj/sponza/sponza.obj");
     while (!glfwWindowShouldClose(window.window())) {
         window.beginFrame();
         float currentFrame = glfwGetTime();
@@ -90,7 +91,7 @@ int main() {
         
         glm::mat4 view = camera.View();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Fov()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Fov()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 500.0f);
 
         lightSourceShader.use();
 
@@ -110,27 +111,23 @@ int main() {
 
         lightTargetShader.use();
 
-        lightTargetShader.setVec3("objectColor", glm::vec3(0.76862745098f)); // Silver
-        lightTargetShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-        lightTargetShader.setVec3("lightPos", lightPos);
-
         // Material properties
-        lightTargetShader.setVec3("material.diffuse1", glm::vec3(0.50754f)); // (not needed if using mtl)
-        lightTargetShader.setVec3("material.specular1", glm::vec3(0.508273f)); // (not needed if using mtl)
         lightTargetShader.setFloat("material.shininess", 0.4f * 128.0f);
 
         // Light properties
+        lightTargetShader.setVec3("light.position", lightPos);
         lightTargetShader.setVec3("light.ambient", glm::vec3(0.2f));
         lightTargetShader.setVec3("light.diffuse", glm::vec3(1.0f));
         lightTargetShader.setVec3("light.specular", glm::vec3(1.0f));
 
         model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.1f));
         lightTargetShader.setMat4("projection", projection);
         lightTargetShader.setMat4("view", view);
         lightTargetShader.setMat4("model", model);
         lightTargetShader.setVec3("viewPos", camera.Position());
 
-		suzanne.Draw(lightTargetShader);
+        sponza.Draw(lightTargetShader);
 
         window.endFrame();
     }

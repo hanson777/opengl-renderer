@@ -1,11 +1,17 @@
+#pragma once
+#include "../texture/texture.h"
+#include <glm/glm.hpp>
+#include <glad/glad.h>
 #include <string>
 
-class Material {
-  public:
-    void Bind();
-
-  private:
+struct Material {
     std::string m_name;
-    uint32_t m_alb;
-    uint32_t m_nrm;
+    glm::vec3 m_ambient;
+    glm::vec3 m_diffuse;
+    glm::vec3 m_specular;
+    float m_shininess;
+    Texture m_diffuseMap;
+    Texture m_specularMap;
+
+    void Bind();
 };

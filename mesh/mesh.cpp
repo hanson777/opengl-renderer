@@ -1,13 +1,14 @@
 #include "mesh.h"
 #include <glad/glad.h>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices) {
-   m_vertices = vertices;
-   m_indices = indices;
-   SetupMesh();
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
+    m_vertices = vertices;
+    m_indices = indices;
+
+    Bind();
 }
 
-void Mesh::SetupMesh() {
+void Mesh::Bind() {
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
     glGenBuffers(1, &m_ebo);
@@ -32,10 +33,6 @@ void Mesh::SetupMesh() {
 
     glBindVertexArray(0);
 } 
-
-void Mesh::SetupMaterial() {
-
-}
 
 void Mesh::Draw(Shader& shader) {
     glBindVertexArray(m_vao);
