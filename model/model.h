@@ -12,8 +12,10 @@ public:
 private:
     std::vector<Mesh> m_meshes;
     std::vector<Material> m_materials;
+    Material m_defaultMaterial;
     std::string m_directory;
 
     void LoadModel(const std::string& path);
     void LoadMaterials(const std::vector<tinyobj::material_t>& materials);
+    void InitDefaultMaterial();
 };

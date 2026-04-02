@@ -33,15 +33,18 @@ void main() {
   vec3 R = reflect(-L, N);
 
   // Ambient 
-  vec3 ambient = (light.ambient * texture(material.diffuse, texCoords).rgb) * Ka;
+  vec3 ambient = Ka * (light.ambient * texture(material.diffuse, texCoords).rgb);
   
   // Diffuse
   float diff = max(dot(N, L), 0.0f);
-  vec3 diffuse = (light.diffuse * diff * texture(material.diffuse, texCoords).rgb) * Kd;  
+  vec3 diffuse = Kd * (light.diffuse * diff * texture(material.diffuse, texCoords).rgb);
+  diffuse.x = pow(diffuse.x, 1/2.2);
+  diffuse.y = pow(diffuse.y, 1/2.2);
+  diffuse.z = pow(diffuse.z, 1/2.2);
   
   // Specular
   float spec = pow(max(dot(V, R), 0.0f), material.shininess);
-  vec3 specular = (light.specular * spec * texture(material.specular, texCoords).rgb) * Ks;
+  vec3 specular = Ks * (light.specular * spec * texture(material.specular, texCoords).rgb);
 
   vec3 result = ambient + diffuse + specular;
   FragColor = vec4(result, 1.0f);

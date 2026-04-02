@@ -6,9 +6,10 @@ class Texture {
   public:
     GLuint Id() const { return m_id; }
     void Load(const std::string filename);
+    void GenerateWhiteTexture();
 
   private:
     GLuint m_id = 0;
 
-    void BindTexture(uint8_t* data, GLenum format, int width, int height);
+    void BindTexture(uint8_t* data, GLenum format, int width, int height, bool srgb);
 };

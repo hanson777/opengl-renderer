@@ -41,6 +41,8 @@ void Model::LoadModel(const std::string& path) {
     vertices.reserve(attrib.vertices.size() / 3);
     indices.reserve(shapes[0].mesh.indices.size());
     uniqueVertices.reserve(attrib.vertices.size() / 3);
+    m_meshes.reserve(shapes.size());
+    m_materials.reserve(materials.size());
 
     std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;
     std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
@@ -69,15 +71,12 @@ void Model::LoadModel(const std::string& path) {
             }
             indices.push_back(uniqueVertices[v]);
         }
-        int matId = shape.mesh.material_ids[0];
         Mesh mesh(vertices, indices);
-        mesh.m_materialId = matId;
-        std::cout << "Material ID: " << matId << std::endl;
+        mesh.m_materialId = shape.mesh.material_ids[0];
         m_meshes.push_back(mesh);
     }
-
-    std::cout << "Material size: " << materials.size() << std::endl;
     LoadMaterials(materials);
+    InitDefaultMaterial();
 }
 
 void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
@@ -91,15 +90,17 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
 
         Texture tex;
         if (!material.diffuse_texname.empty()) {
-            std::cout << "Loading diffuse map..." << std::endl;
             std::string diffusePath = material.diffuse_texname;
             std::replace(diffusePath.begin(), diffusePath.end(), '\\', '/');
             tex.Load(m_directory + diffusePath);
             mat.m_diffuseMap = tex;
         }
+        else {
+            tex.Load("obj/fallbacks/missing_texture.png");
+            mat.m_diffuseMap = tex;
+        }
 
         if (!material.specular_texname.empty()) {
-            std::cout << "Loading specular map..." << std::endl;
             std::string specularPath = material.specular_texname;
             std::replace(specularPath.begin(), specularPath.end(), '\\', '/');
             tex.Load(m_directory + specularPath);
@@ -110,20 +111,33 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
     }
 }
 
+void Model::InitDefaultMaterial() {
+    m_defaultMaterial.m_name = "Default";
+    m_defaultMaterial.m_ambient = glm::vec3(0.1f);
+    m_defaultMaterial.m_diffuse = glm::vec3(1.0f);
+    m_defaultMaterial.m_specular = glm::vec3(0.0f);
+    m_defaultMaterial.m_shininess = 1.0f;
+    
+    Texture tex;
+    tex.Load("obj/fallbacks/missing_texture.png");
+    m_defaultMaterial.m_diffuseMap = tex;
+    tex.GenerateWhiteTexture();
+    m_defaultMaterial.m_specularMap = tex;
+}
+
 void Model::Draw(Shader& shader) {
     for (Mesh& mesh : m_meshes) {
-        if (mesh.m_materialId != -1) {
-            Material& mat = m_materials[mesh.m_materialId];
+        Material& mat = mesh.m_materialId == -1 ? m_defaultMaterial : m_materials[mesh.m_materialId];
 
-            mat.Bind();
+        mat.Bind();
 
-            shader.setVec3("Ka", mat.m_ambient);
-            shader.setVec3("Kd", mat.m_diffuse);
-            shader.setVec3("Ks", mat.m_specular);
-            shader.setFloat("material.shininess", mat.m_shininess);
-            shader.setInt("material.diffuse", 0);
-            shader.setInt("material.specular", 1);
-        }
+        shader.setVec3("Ka", mat.m_ambient);
+        shader.setVec3("Kd", mat.m_diffuse);
+        shader.setVec3("Ks", mat.m_specular);
+        shader.setFloat("material.shininess", mat.m_shininess);
+        shader.setInt("material.diffuse", 0);
+        shader.setInt("material.specular", 1);
+        
         mesh.Draw(shader);
     }
 }
