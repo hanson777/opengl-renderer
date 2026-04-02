@@ -4,37 +4,44 @@
 #include <iostream>
 
 void Texture::Load(const std::string filename) {
-	std::cout << "Loading texture file " << filename << std::endl;
-	int width, height, ncomp;
-	uint8_t* data = stbi_load(filename.c_str(), &width, &height, &ncomp, 0);
-	if (!data) {
-		std::cout << "[ERROR::TEXTURE] failed to load image" << std::endl;
-		return;
-	}
+    std::cout << "Loading texture file " << filename << std::endl;
+    int width, height, ncomp;
+    uint8_t* data = stbi_load(filename.c_str(), &width, &height, &ncomp, 0);
+    if (!data) {
+        std::cout << "[ERROR::TEXTURE] failed to load image" << std::endl;
+        return;
+    }
 
-	GLenum format;
-	if (ncomp == 1) format = GL_RED;
-	else if (ncomp == 2) format = GL_RG;
-	else if (ncomp == 3) format = GL_RGB;
-	else if (ncomp == 4) format = GL_RGBA;
-	else static_assert("[ERROR::TEXTURE] number of components must be in [1,4]");
+    GLenum format;
+    if (ncomp == 1) format = GL_RED;
+    else if (ncomp == 2) format = GL_RG;
+    else if (ncomp == 3) format = GL_RGB;
+    else if (ncomp == 4) format = GL_RGBA;
+    else static_assert("[ERROR::TEXTURE] number of components must be in [1,4]");
 
-	BindTexture(data, format, width, height);
-	stbi_image_free(data);
+    BindTexture(data, format, width, height);
+    stbi_image_free(data);
 }
 
 void Texture::BindTexture(uint8_t* data, GLenum format, int width, int height) {
     glGenTextures(1, &m_id);
     glBindTexture(GL_TEXTURE_2D, m_id);
-	std::cout << "Texture ID: " << m_id << std::endl;
+    std::cout << "Texture ID: " << m_id << std::endl;
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+    GLenum internalFormat;
+    if (format == GL_RED) internalFormat = GL_R8;
+    else if (format == GL_RG) internalFormat = GL_RG8;
+    else if (format == GL_RGB) internalFormat = GL_RGB8;
+    else if (format == GL_RGBA) internalFormat = GL_RGBA8;
+    else internalFormat = format;
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
