@@ -68,7 +68,7 @@ void Model::LoadModel(const std::string& path) {
             }
             indices.push_back(uniqueVertices[v]);
 		}
-        uint32_t matId = shape.mesh.material_ids[0];
+        int matId = shape.mesh.material_ids[0];
         Mesh mesh(vertices, indices);
         mesh.m_materialId = matId;
         std::cout << "Material ID: " << matId << std::endl;
