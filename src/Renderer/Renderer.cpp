@@ -18,6 +18,7 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
+        g_lastFrame = glfwGetTime();
     }
 
     int LoadShader(const std::string& vert, const std::string& frag) {
@@ -101,10 +102,9 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-
         Scene::Update(g_deltaTime);
         Input::Update();
-        
+
         glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
