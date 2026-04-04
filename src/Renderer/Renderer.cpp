@@ -18,7 +18,6 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
-        
     }
 
     int LoadShader(const std::string& vert, const std::string& frag) {
@@ -27,11 +26,13 @@ namespace Renderer {
         return index;
     }
 
-    void BindMesh(Mesh& mesh) {
+    void UploadMesh(Mesh& mesh) {
         glGenVertexArrays(1, &mesh.m_vao);
         glGenBuffers(1, &mesh.m_vbo);
         glGenBuffers(1, &mesh.m_ebo);
+    }
 
+    void BindMesh(const Mesh& mesh) {
         glBindVertexArray(mesh.m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
 
@@ -53,8 +54,11 @@ namespace Renderer {
         glBindVertexArray(0);
     }
 
-    void BindTexture(Texture& texture) {
+    void UploadTexture(Texture& texture) {
         glGenTextures(1, &texture.m_id);
+    }
+
+    void BindTexture(const Texture& texture) {
         glBindTexture(GL_TEXTURE_2D, texture.m_id);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -75,6 +79,15 @@ namespace Renderer {
         glBindTexture(GL_TEXTURE_2D, material.m_diffuseMap.GetId());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.m_specularMap.GetId());
+    }
+
+    void Upload() {
+        for (Mesh& mesh : AssetManager::g_meshes) {
+            UploadMesh(mesh);
+        }
+        for (Texture& texture : AssetManager::g_textures) {
+            UploadTexture(texture);
+        }
     }
 
     void RenderFrame() {
@@ -121,8 +134,10 @@ namespace Renderer {
                     model->GetMaterials()[mesh->m_materialId] : model->GetDefaultMaterial();
 
                 BindMaterial(mat);
-                shader = GetShaderByIndex(g_activeShaderIndex);
-                shader->use();
+                BindMesh(*mesh);
+                BindTexture(mat.m_diffuseMap);
+                BindTexture(mat.m_specularMap);
+
                 shader->setMat4("view", Scene::g_camera.GetViewMatrix());
                 shader->setMat4("projection", projection);
                 shader->setMat4("model", sceneObject.GetModelMatrix());

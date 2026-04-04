@@ -67,6 +67,7 @@ add_executable(${PROJECT_NAME}
     src/Scene/Scene.cpp
     src/Scene/SceneObject.cpp
     src/Renderer/Renderer.cpp
+    src/Input/Input.cpp
     )
 
 # =============================================================================

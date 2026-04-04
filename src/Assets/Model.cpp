@@ -1,15 +1,19 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "Model.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Texture.h"
 #include "AssetManager.h"
 #include <iostream>
 #include <unordered_map>
 #include <chrono>
 #include <algorithm>
+#include <string>
 
-Model::Model(const std::string& path) {
+Model::Model(const std::string& filepath) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    Load(path);
+    Load(filepath);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
@@ -41,7 +45,6 @@ void Model::Load(const std::string& path) {
     vertices.reserve(attrib.vertices.size() / 3);
     indices.reserve(shapes[0].mesh.indices.size());
     uniqueVertices.reserve(attrib.vertices.size() / 3);
-    m_meshes.reserve(shapes.size());
     m_materials.reserve(materials.size());
 
     std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;

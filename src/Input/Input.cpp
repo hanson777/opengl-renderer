@@ -1,6 +1,5 @@
 #include "Input.h"
-#include "../Core/Window.h"
-#include "../Core/Camera.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -31,7 +30,7 @@ namespace Input {
         if (s_firstMouse) {
             s_lastX = xpos;
             s_lastY = ypos;
-            firstMouse = false;
+            s_firstMouse = false;
         }
 
         s_mouseDelta.x = xpos - s_lastX;

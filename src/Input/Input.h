@@ -1,6 +1,7 @@
 #pragma once
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
+struct GLFWwindow;
 
 namespace Input {
     void SetWindow(GLFWwindow* window);

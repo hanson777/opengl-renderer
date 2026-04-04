@@ -1,4 +1,7 @@
 #include "Window.h"
+#include "../Input/Input.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 Window::Window(int width, int height, const char* title) : m_width(width), m_height(height) {
@@ -14,6 +17,7 @@ Window::Window(int width, int height, const char* title) : m_width(width), m_hei
         glfwTerminate();
         return;
     }
+
     glfwMakeContextCurrent(m_window);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -22,15 +26,19 @@ Window::Window(int width, int height, const char* title) : m_width(width), m_hei
         return;
     }
 
-    glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
-    });
+    glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); });
+    glfwSetCursorPosCallback(m_window, MouseCallback);
+    glfwSetScrollCallback(m_window, ScrollCallback);
 
+    Input::SetWindow(m_window);
+
+    glfwMaximizeWindow(m_window);
     glfwSwapInterval(0);
 }
 
 void Window::BeginFrame() {
     glfwPollEvents();
+    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(m_window, true);
 }
 
 void Window::EndFrame() {
@@ -39,4 +47,16 @@ void Window::EndFrame() {
 
 bool Window::ShouldClose() {
     return glfwWindowShouldClose(m_window);
+}
+
+void Window::Shutdown() {
+    glfwTerminate();
+}
+
+void Window::MouseCallback(GLFWwindow* window, double xpos, double ypos) {
+    Input::UpdateMouse(xpos, ypos);
+}
+
+void Window::ScrollCallback(GLFWwindow* window, double dx, double dy) {
+    Input::UpdateScroll(dy);
 }

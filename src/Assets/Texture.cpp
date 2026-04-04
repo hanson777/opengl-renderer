@@ -1,8 +1,9 @@
-#include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
+#include "Texture.h"
 #include <stb_image.h>
 #include <iostream>
 #include <glad/glad.h>
+#include <string>
 
 void Texture::Load(const std::string filename) {
     std::cout << "Loading texture file " << filename << std::endl;
@@ -20,6 +21,7 @@ void Texture::Load(const std::string filename) {
     else if (ncomp == 2) m_format = GL_RG;
     else if (ncomp == 3) m_format = GL_RGB;
     else if (ncomp == 4) m_format = GL_RGBA;
+    else std::cout << ("[ERROR::TEXTURE] number of channels must be in [1,4]") << std::endl; return;
 
     bool srgb = filename.find("diffuse") != std::string::npos;
 

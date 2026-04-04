@@ -2,6 +2,14 @@
 #include "../Renderer/Renderer.h"
 #include "../Assets/AssetManager.h"
 #include "../Input/Input.h"
+#include <iostream>
+
+#define W_KEY 87
+#define S_KEY 83
+#define A_KEY 65
+#define D_KEY 68
+#define SPACE_KEY 32
+#define LEFT_SHIFT_KEY 340
 
 namespace Scene {
     Camera g_camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -23,7 +31,7 @@ namespace Scene {
 
         SceneObject lightCube;
         lightCube.m_modelIndex = cubeIdx;
-        sponza.m_shaderIndex = blankIdx;
+        lightCube.m_shaderIndex = blankIdx;
         lightCube.m_scale = glm::vec3(0.25f);
         lightCube.m_position = glm::vec3(0.0f, 2.0f, 0.0f);
         g_sceneObjects.push_back(lightCube);
@@ -32,17 +40,17 @@ namespace Scene {
     }
 
     void Update(float deltaTime) {
-        if (Input::KeyPressed(GLFW_KEY_W))
+        if (Input::KeyPressed(W_KEY))
             g_camera.ProcessKeyboard(Camera::Forward, deltaTime);
-        if (Input::KeyPressed(GLFW_KEY_S))
+        if (Input::KeyPressed(S_KEY))
             g_camera.ProcessKeyboard(Camera::Backward, deltaTime);
-        if (Input::KeyPressed(GLFW_KEY_A))
+        if (Input::KeyPressed(A_KEY))
             g_camera.ProcessKeyboard(Camera::Left, deltaTime);
-        if (Input::KeyPressed(GLFW_KEY_D))
+        if (Input::KeyPressed(D_KEY))
             g_camera.ProcessKeyboard(Camera::Right, deltaTime);
-        if (Input::KeyPressed(GLFW_KEY_SPACE))
+        if (Input::KeyPressed(SPACE_KEY))
             Scene::g_camera.ProcessKeyboard(Camera::Up, deltaTime);
-        if (Input::KeyPressed(GLFW_KEY_LEFT_SHIFT))
+        if (Input::KeyPressed(LEFT_SHIFT_KEY))
             Scene::g_camera.ProcessKeyboard(Camera::Down, deltaTime);
 
         g_camera.ProcessMouseMovement(Input::GetMouseDelta().x, Input::GetMouseDelta().y);

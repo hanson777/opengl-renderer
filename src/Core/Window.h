@@ -1,6 +1,6 @@
 #pragma once
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+struct GLFWwindow;
 
 class Window {
   public:
@@ -8,7 +8,8 @@ class Window {
     void BeginFrame();
     void EndFrame();
     bool ShouldClose();
-    GLFWwindow* GetHandle() { return m_window; }
+    void Shutdown();
+    GLFWwindow* GetHandle() const { return m_window; }
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
 
@@ -16,4 +17,7 @@ class Window {
     GLFWwindow* m_window;
     int m_width;
     int m_height;
+
+    static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+    static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 };
