@@ -30,9 +30,7 @@ namespace Renderer {
         glGenVertexArrays(1, &mesh.m_vao);
         glGenBuffers(1, &mesh.m_vbo);
         glGenBuffers(1, &mesh.m_ebo);
-    }
 
-    void BindMesh(const Mesh& mesh) {
         glBindVertexArray(mesh.m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
 
@@ -54,11 +52,12 @@ namespace Renderer {
         glBindVertexArray(0);
     }
 
-    void UploadTexture(Texture& texture) {
-        glGenTextures(1, &texture.m_id);
+    void BindMesh(const Mesh& mesh) {
+        glBindVertexArray((mesh.m_vao));
     }
 
-    void BindTexture(const Texture& texture) {
+    void UploadTexture(Texture& texture) {
+        glGenTextures(1, &texture.m_id);
         glBindTexture(GL_TEXTURE_2D, texture.m_id);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -70,8 +69,10 @@ namespace Renderer {
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
-        std::cout << "Texture ID: " << texture.m_id << std::endl;
+    void BindTexture(const Texture& texture) {
+        glBindTexture(GL_TEXTURE_2D, texture.m_id);
     }
 
     void BindMaterial(const Material& material) {
@@ -82,11 +83,16 @@ namespace Renderer {
     }
 
     void Upload() {
-        for (Mesh& mesh : AssetManager::g_meshes) {
+        for (Mesh& mesh : AssetManager::g_meshes)
             UploadMesh(mesh);
-        }
-        for (Texture& texture : AssetManager::g_textures) {
-            UploadTexture(texture);
+
+        for (Model& model : AssetManager::g_models) {
+            for (Material& mat : model.GetMaterials()) {
+                if (!mat.m_diffuseMap.m_data.empty())
+                    UploadTexture(mat.m_diffuseMap);
+                if (!mat.m_specularMap.m_data.empty())
+                    UploadTexture(mat.m_specularMap);
+            }
         }
     }
 
@@ -95,9 +101,10 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-        Input::Update();
-        Scene::Update(g_deltaTime);
 
+        Scene::Update(g_deltaTime);
+        Input::Update();
+        
         glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -135,11 +142,7 @@ namespace Renderer {
 
                 BindMaterial(mat);
                 BindMesh(*mesh);
-                BindTexture(mat.m_diffuseMap);
-                BindTexture(mat.m_specularMap);
 
-                shader->setMat4("view", Scene::g_camera.GetViewMatrix());
-                shader->setMat4("projection", projection);
                 shader->setMat4("model", sceneObject.GetModelMatrix());
                 shader->setVec3("Ka", mat.m_ambient);
                 shader->setVec3("Kd", mat.m_diffuse);
@@ -148,7 +151,6 @@ namespace Renderer {
                 shader->setInt("material.diffuse", 0);
                 shader->setInt("material.specular", 1);
 
-                glBindVertexArray(mesh->m_vao);
                 glDrawElements(GL_TRIANGLES, mesh->m_indices.size(), GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }

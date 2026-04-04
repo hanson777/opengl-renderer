@@ -5,8 +5,9 @@
 int main() {
     Window window(1920, 1080, "hi");
 
-    Scene::Init();
     Renderer::Init();
+    Scene::Init();
+    Renderer::Upload();
 
     while (!window.ShouldClose()) {
         window.BeginFrame();

@@ -10,9 +10,13 @@
 namespace Renderer {
 	void Init();
 
-	void BindMesh(Mesh& mesh);
+	void UploadMesh(Mesh& mesh);
+	void UploadTexture(Texture& texture);
+	void Upload();
+
+	void BindMesh(const Mesh& mesh);
 	void BindMaterial(const Material& material);
-	void BindTexture(Texture& texture);
+	void BindTexture(const Texture& texture);
 
 	void RenderFrame();
 

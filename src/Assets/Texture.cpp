@@ -21,7 +21,7 @@ void Texture::Load(const std::string filename) {
     else if (ncomp == 2) m_format = GL_RG;
     else if (ncomp == 3) m_format = GL_RGB;
     else if (ncomp == 4) m_format = GL_RGBA;
-    else std::cout << ("[ERROR::TEXTURE] number of channels must be in [1,4]") << std::endl; return;
+    else std::cout << ("[ERROR::TEXTURE] number of channels must be in [1,4]") << std::endl;
 
     bool srgb = filename.find("diffuse") != std::string::npos;
 

@@ -10,6 +10,7 @@ public:
     std::vector<int> m_meshIndices;
 
     const std::vector<Material>& GetMaterials() const { return m_materials; }
+    std::vector<Material>& GetMaterials() { return m_materials; }
 
     const Material& GetDefaultMaterial() const { return m_defaultMaterial; }
 
