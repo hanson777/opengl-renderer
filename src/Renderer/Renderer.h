@@ -4,10 +4,6 @@
 #include "../Core/Shader.h"
 
 namespace Renderer {
-	extern Shader* g_activeShader;
-	extern float g_deltaTime;
-	extern float g_lastFrame;
-
 	void Init();
 	void RenderFrame();
 	void BindMesh(Mesh& mesh);

@@ -5,10 +5,15 @@
 class Window {
   public:
     Window(int width, int height, const char* title);
-    void beginFrame();
-    void endFrame();
-    GLFWwindow* window() { return m_window; };
+    void BeginFrame();
+    void EndFrame();
+    bool ShouldClose();
+    GLFWwindow* GetHandle() { return m_window; }
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
 
   private:
     GLFWwindow* m_window;
+    int m_width;
+    int m_height;
 };
