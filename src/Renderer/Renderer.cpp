@@ -1,18 +1,30 @@
 #include "Renderer.h"
+#include "../Assets/Model.h"
+#include "../Assets/Mesh.h"
+#include "../Assets/Material.h"
+#include "../Assets/Texture.h"
 #include "../Assets/AssetManager.h"
 #include "../Core/Shader.h"
+#include "../Input/Input.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
 
 namespace Renderer {
-    Shader* g_activeShader = nullptr;
+    std::vector<Shader> g_shaders;
     float g_deltaTime = 0.0f;
     float g_lastFrame = 0.0f;
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
+        
+    }
+
+    int LoadShader(const std::string& vert, const std::string& frag) {
+        int index = g_shaders.size();
+        g_shaders.emplace_back(vert, frag);
+        return index;
     }
 
     void BindMesh(Mesh& mesh) {
@@ -70,45 +82,69 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
+        Input::Update();
         Scene::Update(g_deltaTime);
 
         glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 view = Scene::g_camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
+
+        // do it for g_lights once we get to multiple lights
+        glm::vec3 lightPos = glm::vec3(0.0f, 2.0f, 0.0f);
+
+        Shader* currentShader = nullptr;
+
         for (SceneObject& sceneObject : Scene::g_sceneObjects) {
 
-            Model* model = sceneObject.m_model;
+            Shader* shader = GetShaderByIndex(sceneObject.m_shaderIndex);
+            if (shader != currentShader) {
+                currentShader = shader;
+                shader->use();
+                shader->setMat4("view", view);
+                shader->setMat4("projection", projection);
+                shader->setVec3("viewPos", Scene::g_camera.GetPosition());
+                shader->setVec3("light.position", lightPos);
+                shader->setVec3("light.ambient", glm::vec3(0.2f));
+                shader->setVec3("light.diffuse", glm::vec3(1.0f));
+                shader->setVec3("light.specular", glm::vec3(1.0f));
+            }
+
+            Model* model = AssetManager::GetModelByIndex(sceneObject.m_modelIndex);
             for (int i = 0; i < model->m_meshIndices.size(); i++) {
 
                 int meshIndex = model->m_meshIndices[i];
                 Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
 
-                const Material& mat = (mesh->m_materialId != -1) ? model->GetMaterials()[mesh->m_materialId] : model->GetDefaultMaterial();
+                const Material& mat = (mesh->m_materialId != -1) ? 
+                    model->GetMaterials()[mesh->m_materialId] : model->GetDefaultMaterial();
 
                 BindMaterial(mat);
-
-                g_activeShader->use();
-
-                glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), (float)1920 / (float)1080, 0.1f, 500.0f);
-
-                g_activeShader->setMat4("view", Scene::g_camera.GetViewMatrix());
-                g_activeShader->setMat4("projection", projection);
-
-                g_activeShader->setMat4("model", sceneObject.GetModelMatrix());
-
-                g_activeShader->setVec3("Ka", mat.m_ambient);
-                g_activeShader->setVec3("Kd", mat.m_diffuse);
-                g_activeShader->setVec3("Ks", mat.m_specular);
-
-                g_activeShader->setFloat("material.shininess", mat.m_shininess);
-
-                g_activeShader->setInt("material.diffuse", 0);
-                g_activeShader->setInt("material.specular", 1);
+                shader = GetShaderByIndex(g_activeShaderIndex);
+                shader->use();
+                shader->setMat4("view", Scene::g_camera.GetViewMatrix());
+                shader->setMat4("projection", projection);
+                shader->setMat4("model", sceneObject.GetModelMatrix());
+                shader->setVec3("Ka", mat.m_ambient);
+                shader->setVec3("Kd", mat.m_diffuse);
+                shader->setVec3("Ks", mat.m_specular);
+                shader->setFloat("material.shininess", mat.m_shininess);
+                shader->setInt("material.diffuse", 0);
+                shader->setInt("material.specular", 1);
 
                 glBindVertexArray(mesh->m_vao);
                 glDrawElements(GL_TRIANGLES, mesh->m_indices.size(), GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }
         }
+    }
+
+    Shader* GetShaderByIndex(int index) {
+        if (index < 0 || index >= g_shaders.size()) {
+            std::cout << "[ERROR::RENDERER] GetShaderByIndex out of bounds" << std::endl;
+            return nullptr;
+        }
+        return &g_shaders[index];
     }
 }
