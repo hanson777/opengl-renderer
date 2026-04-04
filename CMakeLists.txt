@@ -47,8 +47,7 @@ FetchContent_MakeAvailable(glfw glm stb)
 # GLAD - Local files (OpenGL 4.1 Core)
 # =============================================================================
 add_library(glad STATIC
-    ${CMAKE_SOURCE_DIR}/external/glad/src/glad.c
-)
+    ${CMAKE_SOURCE_DIR}/external/glad/src/glad.c)
 target_include_directories(glad PUBLIC
     ${CMAKE_SOURCE_DIR}/external/glad/include
 )
@@ -58,14 +57,17 @@ target_include_directories(glad PUBLIC
 # =============================================================================
 add_executable(${PROJECT_NAME}
     main.cpp
-    shader/shader.cpp
-    camera/camera.cpp
-    window/window.cpp
-    model/model.cpp
-    mesh/mesh.cpp
-    material/material.cpp
-    texture/texture.cpp
-)
+    src/Core/Shader.cpp
+    src/Core/Camera.cpp
+    src/Core/Window.cpp
+    src/Assets/Model.cpp
+    src/Assets/Mesh.cpp
+    src/Assets/Texture.cpp
+    src/Assets/AssetManager.cpp
+    src/Scene/Scene.cpp
+    src/Scene/SceneObject.cpp
+    src/Renderer/Renderer.cpp
+    )
 
 # =============================================================================
 # Include directories

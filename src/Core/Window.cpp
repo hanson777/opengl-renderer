@@ -1,4 +1,4 @@
-#include "window.h"
+#include "Window.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -25,6 +25,8 @@ Window::Window(int width, int height, const char* title) {
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
         glViewport(0, 0, width, height);
     });
+
+    glfwSwapInterval(0);
 
     m_window = window;
 }

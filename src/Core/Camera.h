@@ -1,3 +1,4 @@
+#pragma once
 #include <glm/glm.hpp>
 
 class Camera {
@@ -8,9 +9,9 @@ class Camera {
     void ProcessKeyboard(Direction d, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset);
     void ProcessMouseScroll(float yoffset);
-    glm::mat4 View() const;
-    glm::vec3 Position() const { return m_pos; }
-    float Fov() const { return m_zoom; }
+    glm::mat4 GetViewMatrix() const;
+    glm::vec3 GetPosition() const { return m_pos; }
+    float GetFov() const { return m_zoom; }
 
   private:
     void UpdateCameraVectors();

@@ -3,7 +3,7 @@
 #include <glm/gtx/hash.hpp>
 #include <glm/glm.hpp>
 #include <vector>
-#include "../../shader/shader.h"
+#include <cstdint>
 
 struct Vertex {
 	glm::vec3 position;
@@ -27,12 +27,11 @@ struct std::hash<Vertex> {
 
 struct Mesh {
       Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
-    
-      uint32_t m_vao, m_vbo, m_ebo;
+
+      uint32_t m_vao = 0;
+      uint32_t m_vbo = 0;
+      uint32_t m_ebo = 0;
       std::vector<Vertex> m_vertices;
       std::vector<uint32_t> m_indices;
-      int m_materialId;
-
-      void Draw(Shader& shader);
-      void Bind();
+      int m_materialId = -1;
 };

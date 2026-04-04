@@ -1,22 +1,22 @@
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "model.h"
+#include "Model.h"
+#include "AssetManager.h"
 #include <iostream>
 #include <unordered_map>
-#include <glad/glad.h>
 #include <chrono>
 #include <algorithm>
 
 Model::Model(const std::string& path) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    LoadModel(path);
+    Load(path);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
     std::cout << "Load time: " << elapsed.count() << "ms\n";
 }
 
-void Model::LoadModel(const std::string& path) {
+void Model::Load(const std::string& path) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -48,9 +48,6 @@ void Model::LoadModel(const std::string& path) {
     std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
 
     for (const auto& shape : shapes) {
-        vertices.clear();
-        indices.clear();
-        uniqueVertices.clear();
         for (const auto& index : shape.mesh.indices) {
             Vertex v;
             v.position = { attrib.vertices[3 * index.vertex_index],
@@ -71,9 +68,16 @@ void Model::LoadModel(const std::string& path) {
             }
             indices.push_back(uniqueVertices[v]);
         }
+
         Mesh mesh(vertices, indices);
         mesh.m_materialId = shape.mesh.material_ids[0];
-        m_meshes.push_back(mesh);
+
+        m_meshIndices.push_back(AssetManager::g_meshes.size());
+        AssetManager::g_meshes.push_back(mesh);
+
+        vertices.clear();
+        indices.clear();
+        uniqueVertices.clear();
     }
     LoadMaterials(materials);
     InitDefaultMaterial();
@@ -117,27 +121,10 @@ void Model::InitDefaultMaterial() {
     m_defaultMaterial.m_diffuse = glm::vec3(1.0f);
     m_defaultMaterial.m_specular = glm::vec3(0.0f);
     m_defaultMaterial.m_shininess = 1.0f;
-    
+
     Texture tex;
     tex.Load("obj/fallbacks/missing_texture.png");
     m_defaultMaterial.m_diffuseMap = tex;
     tex.GenerateWhiteTexture();
     m_defaultMaterial.m_specularMap = tex;
-}
-
-void Model::Draw(Shader& shader) {
-    for (Mesh& mesh : m_meshes) {
-        Material& mat = mesh.m_materialId == -1 ? m_defaultMaterial : m_materials[mesh.m_materialId];
-
-        mat.Bind();
-
-        shader.setVec3("Ka", mat.m_ambient);
-        shader.setVec3("Kd", mat.m_diffuse);
-        shader.setVec3("Ks", mat.m_specular);
-        shader.setFloat("material.shininess", mat.m_shininess);
-        shader.setInt("material.diffuse", 0);
-        shader.setInt("material.specular", 1);
-        
-        mesh.Draw(shader);
-    }
 }

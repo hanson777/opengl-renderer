@@ -1,7 +1,6 @@
 #pragma once
-#include "../texture/texture.h"
+#include "Texture.h"
 #include <glm/glm.hpp>
-#include <glad/glad.h>
 #include <string>
 
 struct Material {
@@ -12,6 +11,4 @@ struct Material {
     float m_shininess;
     Texture m_diffuseMap;
     Texture m_specularMap;
-
-    void Bind();
 };

@@ -1,7 +1,8 @@
-#include "camera.h"
+#include "Camera.h"
 #include <algorithm>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 // Default camera values
 const float YAW         = -90.0f;
@@ -56,7 +57,7 @@ void Camera::ProcessMouseScroll(float yoffset) {
         m_zoom = std::clamp(m_zoom, 1.0f, 45.0f);
 }
 
-glm::mat4 Camera::View() const {
+glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(m_pos, m_pos + m_front, m_up);
 }
 
@@ -65,7 +66,7 @@ void Camera::UpdateCameraVectors() {
     m_front.y = sin(glm::radians(m_pitch));
     m_front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
     m_front = glm::normalize(m_front);
-    m_flatFront = glm::vec3(m_front.x, 0.0f, m_front.z);
+    m_flatFront = glm::normalize(glm::vec3(m_front.x, 0.0f, m_front.z));
     m_right = glm::normalize(glm::cross(m_front, m_up));
     // m_up = glm::normalize(glm::cross(m_right, m_front));
 }

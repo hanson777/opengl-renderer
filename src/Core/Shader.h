@@ -3,8 +3,10 @@
 #include <glm/glm.hpp>
 
 class Shader {
-  public:
+public:
+    Shader() = default;
     Shader(std::string vertexPath, std::string fragmentPath);
+
     void use();
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
@@ -13,6 +15,6 @@ class Shader {
     void setMat4(const std::string& name, const glm::mat4& mat4) const;
     uint32_t id() const;
 
-  private:
+private:
     uint32_t m_id;
 };

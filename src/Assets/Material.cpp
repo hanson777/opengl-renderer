@@ -1,4 +1,4 @@
-#include "material.h"
+#include "Material.h"
 #include <glad/glad.h>
 
 void Material::Bind() {
