@@ -13,6 +13,10 @@ void Scene::Update(float deltaTime) {
         g_camera.ProcessKeyboard(Camera::Left, deltaTime);
     if (Input::KeyPressed(GLFW_KEY_D))
         g_camera.ProcessKeyboard(Camera::Right, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_SPACE))
+        Scene::g_camera.ProcessKeyboard(Camera::Up, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_LEFT_SHIFT))
+        Scene::g_camera.ProcessKeyboard(Camera::Down, deltaTime);
 
     g_camera.ProcessMouseMovement(Input::GetMouseDelta().x, Input::GetMouseDelta().y);
     g_camera.ProcessMouseScroll(Input::GetScrollDelta());
