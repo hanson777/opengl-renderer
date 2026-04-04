@@ -72,11 +72,12 @@ void Model::Load(const std::string& path) {
             indices.push_back(uniqueVertices[v]);
         }
 
-        Mesh mesh(vertices, indices);
-        mesh.m_materialId = shape.mesh.material_ids[0];
-
-        m_meshIndices.push_back(AssetManager::g_meshes.size());
-        AssetManager::g_meshes.push_back(mesh);
+        MeshData data;
+        data.m_vertices = vertices;
+        data.m_indices = indices;
+        data.m_materialId = shape.mesh.material_ids[0];
+        m_meshIndices.push_back(AssetManager::g_meshData.size());
+        AssetManager::g_meshData.push_back(std::move(data));
 
         vertices.clear();
         indices.clear();
@@ -103,7 +104,7 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
             mat.m_diffuseMap = tex;
         }
         else {
-            tex.Load("obj/fallbacks/missing_texture.png");
+            tex.Load("res/fallbacks/missing_texture.png");
             mat.m_diffuseMap = tex;
         }
 

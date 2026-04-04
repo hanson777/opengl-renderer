@@ -11,7 +11,7 @@ struct Texture {
     int m_format = 0;
     int m_internalFormat = 0;
 
-    void Load(const std::string filename);
+    void Load(const std::string& filename);
     void GenerateWhiteTexture();
 
     uint32_t GetId() const { return m_id; }

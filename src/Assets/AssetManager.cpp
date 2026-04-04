@@ -7,6 +7,7 @@
 namespace AssetManager {
 	std::vector<Model> g_models;
 	std::vector<Mesh> g_meshes;
+	std::vector<MeshData> g_meshData;
 
 	int LoadModel(const std::string& filepath) {
 		int index = g_models.size();

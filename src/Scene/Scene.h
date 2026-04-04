@@ -7,6 +7,5 @@ namespace Scene {
 	extern Camera g_camera;
 	extern std::vector<SceneObject> g_sceneObjects;
 
-	void Init();
 	void Update(float deltaTime);
 }

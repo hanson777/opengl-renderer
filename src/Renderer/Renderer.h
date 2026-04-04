@@ -8,6 +8,8 @@
 #include <string>
 
 namespace Renderer {
+	extern float g_deltaTime;
+
 	void Init();
 
 	void UploadMesh(Mesh& mesh);
@@ -16,7 +18,6 @@ namespace Renderer {
 
 	void BindMesh(const Mesh& mesh);
 	void BindMaterial(const Material& material);
-	void BindTexture(const Texture& texture);
 
 	void RenderFrame();
 

@@ -27,7 +27,10 @@ namespace Renderer {
         return index;
     }
 
-    void UploadMesh(Mesh& mesh) {
+    void UploadMesh(Mesh& mesh, const MeshData& data) {
+        mesh.m_indexCount = data.m_indices.size();
+        mesh.m_materialId = data.m_materialId;
+
         glGenVertexArrays(1, &mesh.m_vao);
         glGenBuffers(1, &mesh.m_vbo);
         glGenBuffers(1, &mesh.m_ebo);
@@ -35,10 +38,10 @@ namespace Renderer {
         glBindVertexArray(mesh.m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
 
-        glBufferData(GL_ARRAY_BUFFER, mesh.m_vertices.size() * sizeof(Vertex), &mesh.m_vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.m_vertices.size() * sizeof(Vertex), &data.m_vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices.size() * sizeof(uint32_t), &mesh.m_indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.m_indices.size() * sizeof(uint32_t), &data.m_indices[0], GL_STATIC_DRAW);
 
         // vertex positions
         glEnableVertexAttribArray(0);
@@ -54,7 +57,7 @@ namespace Renderer {
     }
 
     void BindMesh(const Mesh& mesh) {
-        glBindVertexArray((mesh.m_vao));
+        glBindVertexArray(mesh.m_vao);
     }
 
     void UploadTexture(Texture& texture) {
@@ -72,10 +75,6 @@ namespace Renderer {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void BindTexture(const Texture& texture) {
-        glBindTexture(GL_TEXTURE_2D, texture.m_id);
-    }
-
     void BindMaterial(const Material& material) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.m_diffuseMap.GetId());
@@ -84,10 +83,16 @@ namespace Renderer {
     }
 
     void Upload() {
-        for (Mesh& mesh : AssetManager::g_meshes)
-            UploadMesh(mesh);
-
+        for (MeshData& data : AssetManager::g_meshData) {
+            Mesh mesh;
+            UploadMesh(mesh, data);
+            AssetManager::g_meshes.push_back(mesh);
+        }
+        AssetManager::g_meshData.clear();
+        AssetManager::g_meshData.shrink_to_fit();
         for (Model& model : AssetManager::g_models) {
+            UploadTexture(model.GetDefaultMaterial().m_diffuseMap);
+            UploadTexture(model.GetDefaultMaterial().m_specularMap);
             for (Material& mat : model.GetMaterials()) {
                 if (!mat.m_diffuseMap.m_data.empty())
                     UploadTexture(mat.m_diffuseMap);
@@ -102,9 +107,6 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-        Scene::Update(g_deltaTime);
-        Input::Update();
-
         glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -117,6 +119,7 @@ namespace Renderer {
         Shader* currentShader = nullptr;
 
         for (SceneObject& sceneObject : Scene::g_sceneObjects) {
+            glm::mat4 modelMatrix = sceneObject.GetModelMatrix();
 
             Shader* shader = GetShaderByIndex(sceneObject.m_shaderIndex);
             if (shader != currentShader) {
@@ -143,7 +146,7 @@ namespace Renderer {
                 BindMaterial(mat);
                 BindMesh(*mesh);
 
-                shader->setMat4("model", sceneObject.GetModelMatrix());
+                shader->setMat4("model", modelMatrix);
                 shader->setVec3("Ka", mat.m_ambient);
                 shader->setVec3("Kd", mat.m_diffuse);
                 shader->setVec3("Ks", mat.m_specular);
@@ -151,7 +154,7 @@ namespace Renderer {
                 shader->setInt("material.diffuse", 0);
                 shader->setInt("material.specular", 1);
 
-                glDrawElements(GL_TRIANGLES, mesh->m_indices.size(), GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, mesh->m_indexCount, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }
         }

@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <string>
 
-void Texture::Load(const std::string filename) {
+void Texture::Load(const std::string& filename) {
     std::cout << "Loading texture file " << filename << std::endl;
     int ncomp;
     uint8_t* stbiData = stbi_load(filename.c_str(), &m_width, &m_height, &ncomp, 0);

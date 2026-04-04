@@ -25,13 +25,16 @@ struct std::hash<Vertex> {
     }
 };
 
-struct Mesh {
-      Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+struct MeshData {
+    std::vector<Vertex> m_vertices;
+    std::vector<uint32_t> m_indices;
+    int m_materialId = -1;
+};
 
+struct Mesh {
       uint32_t m_vao = 0;
       uint32_t m_vbo = 0;
       uint32_t m_ebo = 0;
-      std::vector<Vertex> m_vertices;
-      std::vector<uint32_t> m_indices;
+      uint32_t m_indexCount = 0;
       int m_materialId = -1;
 };

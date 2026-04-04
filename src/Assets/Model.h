@@ -13,6 +13,7 @@ public:
     std::vector<Material>& GetMaterials() { return m_materials; }
 
     const Material& GetDefaultMaterial() const { return m_defaultMaterial; }
+    Material& GetDefaultMaterial() { return m_defaultMaterial; }
 
 private:
     std::vector<Material> m_materials;

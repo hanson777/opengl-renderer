@@ -6,6 +6,7 @@ class Camera {
     Camera(glm::vec3 pos, glm::vec3 up);
     enum Direction { Forward, Backward, Left, Right, Up, Down};
 
+    void Update(float deltaTime);
     void ProcessKeyboard(Direction d, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset);
     void ProcessMouseScroll(float yoffset);

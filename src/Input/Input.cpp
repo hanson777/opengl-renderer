@@ -33,8 +33,8 @@ namespace Input {
             s_firstMouse = false;
         }
 
-        s_mouseDelta.x = xpos - s_lastX;
-        s_mouseDelta.y = s_lastY - ypos;
+        s_mouseDelta.x += xpos - s_lastX;
+        s_mouseDelta.y += s_lastY - ypos;
 
         s_lastX = xpos;
         s_lastY = ypos;

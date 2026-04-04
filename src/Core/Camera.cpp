@@ -1,7 +1,9 @@
 #include "Camera.h"
+#include "../Input/Input.h"
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <algorithm>
 
@@ -23,6 +25,25 @@ Camera::Camera(glm::vec3 pos, glm::vec3 up) {
     m_mouseSensitivity = SENSITIVITY;
     m_zoom = ZOOM;
     UpdateCameraVectors();
+}
+
+void Camera::Update(float deltaTime) {
+    if (Input::KeyPressed(GLFW_KEY_W))
+        ProcessKeyboard(Forward, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_S))
+        ProcessKeyboard(Backward, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_A))
+        ProcessKeyboard(Left, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_D))
+        ProcessKeyboard(Right, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_SPACE))
+        ProcessKeyboard(Up, deltaTime);
+    if (Input::KeyPressed(GLFW_KEY_LEFT_SHIFT))
+        ProcessKeyboard(Down, deltaTime);
+
+    glm::vec2 mouseDelta = Input::GetMouseDelta();
+    ProcessMouseMovement(mouseDelta.x, mouseDelta.y);
+    ProcessMouseScroll(Input::GetScrollDelta());
 }
 
 void Camera::ProcessKeyboard(Direction d, float deltaTime) {

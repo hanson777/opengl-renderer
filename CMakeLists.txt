@@ -61,13 +61,13 @@ add_executable(${PROJECT_NAME}
     src/Core/Camera.cpp
     src/Core/Window.cpp
     src/Assets/Model.cpp
-    src/Assets/Mesh.cpp
     src/Assets/Texture.cpp
     src/Assets/AssetManager.cpp
     src/Scene/Scene.cpp
     src/Scene/SceneObject.cpp
     src/Renderer/Renderer.cpp
     src/Input/Input.cpp
+    src/Game/Game.cpp
     )
 
 # =============================================================================
