@@ -104,7 +104,7 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
             mat.m_diffuseMap = tex;
         }
         else {
-            tex.Load("res/fallbacks/missing_texture.png");
+            tex.Load("res/textures/fallbacks/missing_texture.png");
             mat.m_diffuseMap = tex;
         }
 
@@ -127,7 +127,7 @@ void Model::InitDefaultMaterial() {
     m_defaultMaterial.m_shininess = 1.0f;
 
     Texture tex;
-    tex.Load("obj/fallbacks/missing_texture.png");
+    tex.Load("res/textures/fallbacks/missing_texture.png");
     m_defaultMaterial.m_diffuseMap = tex;
     tex.GenerateWhiteTexture();
     m_defaultMaterial.m_specularMap = tex;

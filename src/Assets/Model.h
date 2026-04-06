@@ -1,7 +1,7 @@
 #pragma once
-#include "Mesh.h"
 #include "Material.h"
 #include <tiny_obj_loader.h>
+#include <vector>
 
 class Model {
 public:
