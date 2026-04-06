@@ -5,8 +5,8 @@
 
 namespace Game {
     void Init() {
-        int blankIdx = Renderer::LoadShader("shaders/blankShader.vert", "shaders/blankShader.frag");
-        int phongIdx = Renderer::LoadShader("shaders/phongShader.vert", "shaders/phongShader.frag");
+        int blankIdx = Renderer::LoadShader("shaders/blank.vert", "shaders/blank.frag");
+        int phongIdx = Renderer::LoadShader("shaders/phong.vert", "shaders/phong.frag");
 
         int sponzaIdx = AssetManager::LoadModel("res/sponza/sponza.obj");
         int cubeIdx = AssetManager::LoadModel("res/cube/cube.obj");
