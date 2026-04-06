@@ -8,6 +8,6 @@ struct SceneObject {
     int m_modelIndex = -1;
     int m_shaderIndex = -1;
 
-    glm::mat4 GetModelMatrix();
+    glm::mat4 GetModelMatrix() const;
     void Update(float deltaTime);
 };

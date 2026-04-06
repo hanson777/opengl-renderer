@@ -2,14 +2,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-glm::mat4 SceneObject::GetModelMatrix() {
-    glm::mat4 t = glm::translate(glm::mat4(1.0f), m_position);
-    glm::mat4 r = glm::mat4(1.0f);
-    r = glm::rotate(r, glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
-    r = glm::rotate(r, glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
-    r = glm::rotate(r, glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
-    glm::mat4 s = glm::scale(glm::mat4(1.0f), m_scale);
-    return t * r * s;
+glm::mat4 SceneObject::GetModelMatrix() const {
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, m_position);
+    model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
+    model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
+    model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
+    model = glm::scale(model, m_scale);
+    return model;
 }
 
 void SceneObject::Update(float deltaTime) {

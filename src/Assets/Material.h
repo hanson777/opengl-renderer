@@ -11,4 +11,5 @@ struct Material {
     float m_shininess;
     Texture m_diffuseMap;
     Texture m_specularMap;
+    Texture m_normalMap;
 };

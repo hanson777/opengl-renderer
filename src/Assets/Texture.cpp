@@ -6,7 +6,7 @@
 #include <string>
 
 void Texture::Load(const std::string& filename) {
-    std::cout << "Loading texture file " << filename << std::endl;
+    std::cout << "Loading texture file " << filename << '\n';
     int ncomp;
     uint8_t* stbiData = stbi_load(filename.c_str(), &m_width, &m_height, &ncomp, 0);
     if (!stbiData) {
