@@ -4,8 +4,9 @@
 #include "../Assets/Material.h"
 #include "../Assets/Texture.h"
 #include "../Assets/AssetManager.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneObject.h"
 #include "../Core/Shader.h"
-#include "../Input/Input.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
@@ -51,7 +52,10 @@ namespace Renderer {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
         // vertex texture coords
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+        // vertex tangent 
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
         glBindVertexArray(0);
     }
@@ -80,6 +84,8 @@ namespace Renderer {
         glBindTexture(GL_TEXTURE_2D, material.m_diffuseMap.GetId());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.m_specularMap.GetId());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, material.m_normalMap.GetId());
     }
 
     void Upload() {
@@ -153,6 +159,7 @@ namespace Renderer {
                 shader->setFloat("material.shininess", mat.m_shininess);
                 shader->setInt("material.diffuse", 0);
                 shader->setInt("material.specular", 1);
+                shader->setInt("material.normal", 2);
 
                 glDrawElements(GL_TRIANGLES, mesh->m_indexCount, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);

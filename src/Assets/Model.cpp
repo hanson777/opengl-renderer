@@ -62,7 +62,7 @@ void Model::Load(const std::string& path) {
                              attrib.normals[3 * index.normal_index + 2] };
             }
             if (index.texcoord_index >= 0) {
-                v.texCoords = { attrib.texcoords[2 * index.texcoord_index],
+                v.uv = { attrib.texcoords[2 * index.texcoord_index],
                                 1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
             }
             if (!uniqueVertices.contains(v)) {
@@ -70,6 +70,26 @@ void Model::Load(const std::string& path) {
                 vertices.push_back(v);
             }
             indices.push_back(uniqueVertices[v]);
+        }
+
+        for (int i = 0; i < indices.size(); i += 3) {
+            Vertex& v0 = vertices[indices[i]];
+            Vertex& v1 = vertices[indices[i + 1]];
+            Vertex& v2 = vertices[indices[i + 2]];
+            
+            glm::vec3 e0 = v1.position - v0.position;
+            glm::vec3 e1 = v2.position - v0.position;
+            
+            glm::vec2 u0 = v1.uv - v0.uv;
+            glm::vec2 u1 = v2.uv - v0.uv;
+            
+            float f = (u0.x * u1.y) - (u1.x * u0.y);
+            f = 1.0 / f;
+            glm::vec3 tangent = f * (u1.y * e0 - u0.y * e1);
+
+            v0.tangent += tangent;
+            v1.tangent += tangent;
+            v2.tangent += tangent;
         }
 
         MeshData data;

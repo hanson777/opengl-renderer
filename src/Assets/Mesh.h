@@ -8,10 +8,11 @@
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
-	glm::vec2 texCoords;
+	glm::vec2 uv;
+    glm::vec3 tangent;
 
     bool operator==(const Vertex& other) const {
-        return position == other.position && normal == other.normal && texCoords == other.texCoords;
+        return position == other.position && normal == other.normal && uv == other.uv;
     };
 };
 
@@ -20,7 +21,7 @@ struct std::hash<Vertex> {
     size_t operator()(const Vertex& v) const noexcept {
         size_t h1 = hash<glm::vec3>()(v.position);
         size_t h2 = hash<glm::vec3>()(v.normal);
-        size_t h3 = hash<glm::vec2>()(v.texCoords);
+        size_t h3 = hash<glm::vec2>()(v.uv);
         return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
     }
 };

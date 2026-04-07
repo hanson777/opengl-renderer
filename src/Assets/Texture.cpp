@@ -4,13 +4,14 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <string>
+#include <vector>
 
 void Texture::Load(const std::string& filename) {
     std::cout << "Loading texture file " << filename << '\n';
     int ncomp;
     uint8_t* stbiData = stbi_load(filename.c_str(), &m_width, &m_height, &ncomp, 0);
     if (!stbiData) {
-        std::cout << "[ERROR::TEXTURE] failed to load image" << std::endl;
+        std::cout << "[ERROR::TEXTURE] failed to load " << filename << std::endl;
         return;
     }
 
@@ -33,7 +34,6 @@ void Texture::Load(const std::string& filename) {
 }
 
 void Texture::GenerateWhiteTexture() {
-    std::cout << "Loading white texture\n";
     m_data = { 255, 255, 255, 255 };
     m_width = 1;
     m_height = 1;

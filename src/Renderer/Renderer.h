@@ -1,6 +1,4 @@
 #pragma once
-#include "../Scene/Scene.h"
-#include "../Assets/AssetManager.h"
 #include "../Assets/Mesh.h"
 #include "../Assets/Material.h"
 #include "../Assets/Texture.h"
