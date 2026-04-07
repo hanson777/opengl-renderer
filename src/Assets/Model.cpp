@@ -21,13 +21,15 @@ Model::Model(const std::string& filepath) {
 }
 
 void Model::Load(const std::string& path) {
+    std::cout << "Loading model " << path << '\n';
+
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string err;
 
     m_directory = path.substr(0, path.find_last_of("/\\")) + "/";
-    std::cout << "Directory: " << m_directory << std::endl;
+
     bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), m_directory.c_str());
     if (!success) {
         std::cout << "[ERROR::MODEL] " << err << std::endl;
@@ -76,14 +78,15 @@ void Model::Load(const std::string& path) {
             Vertex& v0 = vertices[indices[i]];
             Vertex& v1 = vertices[indices[i + 1]];
             Vertex& v2 = vertices[indices[i + 2]];
-            
+
             glm::vec3 e0 = v1.position - v0.position;
             glm::vec3 e1 = v2.position - v0.position;
-            
+
             glm::vec2 u0 = v1.uv - v0.uv;
             glm::vec2 u1 = v2.uv - v0.uv;
-            
+
             float f = (u0.x * u1.y) - (u1.x * u0.y);
+            if (fabs(f) < 1e-6f) continue;
             f = 1.0 / f;
             glm::vec3 tangent = f * (u1.y * e0 - u0.y * e1);
 
@@ -96,6 +99,7 @@ void Model::Load(const std::string& path) {
         data.m_vertices = vertices;
         data.m_indices = indices;
         data.m_materialId = shape.mesh.material_ids[0];
+
         m_meshIndices.push_back(AssetManager::g_meshData.size());
         AssetManager::g_meshData.push_back(std::move(data));
 

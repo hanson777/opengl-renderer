@@ -21,15 +21,16 @@ namespace Game {
         lightCube.m_modelIndex = cubeIdx;
         lightCube.m_shaderIndex = blankIdx;
         lightCube.m_scale = glm::vec3(0.25);
-        lightCube.m_position = glm::vec3(0, 0, 3);
+        lightCube.m_position = glm::vec3(0, 0, 4);
         Scene::g_sceneObjects.push_back(lightCube);
 
         SceneObject brick; 
         brick.m_modelIndex = cubeIdx;
         brick.m_shaderIndex = phongIdx;
         brick.m_position = glm::vec3(0, 0, 0);
+        brick.m_scale = glm::vec3(3);
         Material& mat = AssetManager::GetModelByIndex(cubeIdx)->GetMaterials()[0];
-        mat.m_diffuseMap.Load(("res/textures/red_brick/red_brick_diff_4k.jpg"));
+        mat.m_diffuseMap.Load("res/textures/red_brick/red_brick_diff_4k.jpg");
         mat.m_normalMap.Load("res/textures/red_brick/red_brick_nor_gl_4k.png");
         Scene::g_sceneObjects.push_back(brick);
 

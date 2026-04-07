@@ -30,22 +30,22 @@ uniform Light light;
 
 void main() {
   vec3 N = texture(material.normal, uv).rgb;
-  N = N * 2 - 1;
+  N = (N * 2) - 1;
   N = normalize(TBN * N);
   vec3 L = normalize(light.position - fragPos);
   vec3 V = normalize(viewPos - fragPos);
   vec3 R = reflect(-L, N);
-  
+
   // Ambient 
   vec3 ambient = Ka * (light.ambient * texture(material.diffuse, uv).rgb);
-  
+
   // Diffuse
   float diff = max(dot(N, L), 0.0f);
   vec3 diffuse = Kd * (light.diffuse * diff * texture(material.diffuse, uv).rgb);
   diffuse.x = pow(diffuse.x, 1.0/2.2);
   diffuse.y = pow(diffuse.y, 1.0/2.2);
   diffuse.z = pow(diffuse.z, 1.0/2.2);
-  
+
   // Specular
   float spec = pow(max(dot(V, R), 0.0f), material.shininess);
   vec3 specular = Ks * (light.specular * spec * texture(material.specular, uv).rgb);

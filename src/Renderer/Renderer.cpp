@@ -82,8 +82,10 @@ namespace Renderer {
     void BindMaterial(const Material& material) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.m_diffuseMap.GetId());
+
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.m_specularMap.GetId());
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, material.m_normalMap.GetId());
     }
@@ -104,6 +106,8 @@ namespace Renderer {
                     UploadTexture(mat.m_diffuseMap);
                 if (!mat.m_specularMap.m_data.empty())
                     UploadTexture(mat.m_specularMap);
+                if (!mat.m_normalMap.m_data.empty())
+                    UploadTexture(mat.m_normalMap);
             }
         }
     }
@@ -120,7 +124,10 @@ namespace Renderer {
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
 
         // do it for g_lights once we get to multiple lights
-        glm::vec3 lightPos = glm::vec3(0.0f, 2.0f, 0.0f);
+        // TODO: PASS IT DOWN!! DON'T HARD CODE LIGHTPOS
+        // RIGHT NOW U HAVE TO CHANGE IT IN GAME 
+        // AND IN HERE!
+        glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 4.0f);
 
         Shader* currentShader = nullptr;
 

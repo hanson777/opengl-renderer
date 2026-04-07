@@ -4,7 +4,6 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <algorithm>
 
 // Default camera values
