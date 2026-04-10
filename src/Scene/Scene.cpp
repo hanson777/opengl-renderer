@@ -7,6 +7,7 @@
 namespace Scene {
     Camera g_camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     std::vector<SceneObject> g_sceneObjects;
+    std::vector<Light> g_lights;
 
     void Update(float deltaTime) {
         g_camera.Update(deltaTime);

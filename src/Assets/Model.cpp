@@ -122,9 +122,9 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
 
         Texture tex;
         if (!material.diffuse_texname.empty()) {
-            std::string diffusePath = material.diffuse_texname;
-            std::replace(diffusePath.begin(), diffusePath.end(), '\\', '/');
-            tex.Load(m_directory + diffusePath);
+            std::string path = material.diffuse_texname;
+            std::replace(path.begin(), path.end(), '\\', '/');
+            tex.Load(m_directory + path);
             mat.m_diffuseMap = tex;
         }
         else {
@@ -133,10 +133,17 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
         }
 
         if (!material.specular_texname.empty()) {
-            std::string specularPath = material.specular_texname;
-            std::replace(specularPath.begin(), specularPath.end(), '\\', '/');
-            tex.Load(m_directory + specularPath);
+            std::string path = material.specular_texname;
+            std::replace(path.begin(), path.end(), '\\', '/');
+            tex.Load(m_directory + path);
             mat.m_specularMap = tex;
+        }
+
+        if (!material.normal_texname.empty()) {
+            std::string path = material.normal_texname;
+            std::replace(path.begin(), path.end(), '\\', '/');
+            tex.Load(m_directory + path);
+            mat.m_normalMap = tex;
         }
 
         m_materials.push_back(mat);

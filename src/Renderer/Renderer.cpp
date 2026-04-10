@@ -6,6 +6,7 @@
 #include "../Assets/AssetManager.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneObject.h"
+#include "../Scene/Light.h"
 #include "../Core/Shader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -19,6 +20,7 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
         g_lastFrame = glfwGetTime();
     }
 
@@ -117,7 +119,8 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-        glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
+        // glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
+        glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
@@ -127,11 +130,13 @@ namespace Renderer {
         // TODO: PASS IT DOWN!! DON'T HARD CODE LIGHTPOS
         // RIGHT NOW U HAVE TO CHANGE IT IN GAME 
         // AND IN HERE!
-        glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 4.0f);
 
         Shader* currentShader = nullptr;
+        
+        Light& light = Scene::g_lights[0];
 
         for (SceneObject& sceneObject : Scene::g_sceneObjects) {
+
             glm::mat4 modelMatrix = sceneObject.GetModelMatrix();
 
             Shader* shader = GetShaderByIndex(sceneObject.m_shaderIndex);
@@ -141,10 +146,13 @@ namespace Renderer {
                 shader->setMat4("view", view);
                 shader->setMat4("projection", projection);
                 shader->setVec3("viewPos", Scene::g_camera.GetPosition());
-                shader->setVec3("light.position", lightPos);
-                shader->setVec3("light.ambient", glm::vec3(0.2f));
-                shader->setVec3("light.diffuse", glm::vec3(1.0f));
-                shader->setVec3("light.specular", glm::vec3(1.0f));
+
+                for (int i = 0; i < Scene::g_lights.size(); i++) {
+                    shader->setVec3("lights[" + std::to_string(i) + "].position", light.position);
+                    shader->setVec3("lights[" + std::to_string(i) + "].direction", light.direction);
+                    shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
+                    shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                }
             }
 
             Model* model = AssetManager::GetModelByIndex(sceneObject.m_modelIndex);
