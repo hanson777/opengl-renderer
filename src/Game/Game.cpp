@@ -30,7 +30,7 @@ namespace Game {
 
         // Light dirLight;
         // dirLight.type = LightType::Directional;
-        // dirLight.color = glm::vec3(0, 1, 0);
+        // dirLight.color = glm::vec3(1, 1, 1);
         // dirLight.direction = glm::vec3(0, -1, 0);
         // dirLight.intensity = 0.3f;
         // Scene::g_lights.push_back(dirLight);

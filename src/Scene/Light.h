@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 
-enum class LightType { Directional = 0, Point = 1, Spot = 2 };
+enum class LightType : int { Point = 0, Directional = 1, Spot = 2 };
 
 struct Light {
     LightType type;

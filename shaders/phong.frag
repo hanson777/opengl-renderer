@@ -29,6 +29,21 @@ uniform vec3 Ks;
 uniform Material material;
 uniform Light lights[10];
 
+vec3 calcDirectionalLight(Light light, vec3 N, vec3 V) {
+  vec3 L = normalize(-light.direction);
+
+  // Diffuse
+  float diff = max(dot(N, L), 0.0);
+  vec3 diffuse = Kd * (light.color * diff * texture(material.diffuse, uv).rgb);
+
+  // Specular
+  vec3 R = reflect(-L, N);
+  float spec = pow(max(dot(V, R), 0.0), material.shininess);
+  vec3 specular = Ks * (light.color * spec * texture(material.specular, uv).rgb);
+
+  return light.intensity * (diffuse + specular);
+}
+
 vec3 calcPointLight(Light light, vec3 N, vec3 V) {
   vec3 L = normalize(light.position - fragPos);
 
@@ -62,7 +77,12 @@ void main() {
 
   vec3 result = ambient;
   for (int i = 0; i < 10; i++) {
-    result += calcPointLight(lights[i], N, V);
+    // result += calcPointLight(lights[i], N, V);
+    if (lights[i].type == 0) { 
+      result += calcPointLight(lights[i], N, V);
+    } else if (lights[i].type == 1) {
+      result += calcDirectionalLight(lights[i], N, V);
+    }
   }
 
   result = pow(result, vec3(1.0 / 2.2));
