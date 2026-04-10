@@ -126,14 +126,7 @@ namespace Renderer {
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
 
-        // do it for g_lights once we get to multiple lights
-        // TODO: PASS IT DOWN!! DON'T HARD CODE LIGHTPOS
-        // RIGHT NOW U HAVE TO CHANGE IT IN GAME 
-        // AND IN HERE!
-
         Shader* currentShader = nullptr;
-        
-        Light& light = Scene::g_lights[0];
 
         for (SceneObject& sceneObject : Scene::g_sceneObjects) {
 
@@ -148,10 +141,12 @@ namespace Renderer {
                 shader->setVec3("viewPos", Scene::g_camera.GetPosition());
 
                 for (int i = 0; i < Scene::g_lights.size(); i++) {
+                    const Light& light = Scene::g_lights[i];
                     shader->setVec3("lights[" + std::to_string(i) + "].position", light.position);
                     shader->setVec3("lights[" + std::to_string(i) + "].direction", light.direction);
                     shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
                     shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                    shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
                 }
             }
 
