@@ -40,78 +40,85 @@ void Model::Load(const std::string& path) {
         std::cout << "[ERROR::MODEL::NON_FATAL] " << err << std::endl;
     }
 
-    std::unordered_map<Vertex, uint32_t> uniqueVertices;
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-
-    vertices.reserve(attrib.vertices.size() / 3);
-    indices.reserve(shapes[0].mesh.indices.size());
-    uniqueVertices.reserve(attrib.vertices.size() / 3);
-    m_materials.reserve(materials.size());
-
     std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;
     std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
 
     for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
-            Vertex v;
-            v.position = { attrib.vertices[3 * index.vertex_index],
-                           attrib.vertices[3 * index.vertex_index + 1],
-                           attrib.vertices[3 * index.vertex_index + 2] };
-            if (index.normal_index >= 0) {
-                v.normal = { attrib.normals[3 * index.normal_index],
-                             attrib.normals[3 * index.normal_index + 1],
-                             attrib.normals[3 * index.normal_index + 2] };
+
+        std::unordered_map<int, std::vector<tinyobj::index_t>> materialGroups;
+        for (int i = 0; i < shape.mesh.material_ids.size(); i++) {
+            int matId = shape.mesh.material_ids[i];
+            for (int j = 0; j < 3; j++) {
+                materialGroups[matId].push_back(shape.mesh.indices[3 * i + j]);
             }
-            if (index.texcoord_index >= 0) {
-                v.uv = { attrib.texcoords[2 * index.texcoord_index],
-                                1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
-            }
-            if (!uniqueVertices.contains(v)) {
-                uniqueVertices[v] = vertices.size();
-                vertices.push_back(v);
-            }
-            indices.push_back(uniqueVertices[v]);
         }
 
-        for (int i = 0; i < indices.size(); i += 3) {
-            Vertex& v0 = vertices[indices[i]];
-            Vertex& v1 = vertices[indices[i + 1]];
-            Vertex& v2 = vertices[indices[i + 2]];
+        for (const auto& [matId, vertexIndices] : materialGroups) {
 
-            glm::vec3 e0 = v1.position - v0.position;
-            glm::vec3 e1 = v2.position - v0.position;
+            std::unordered_map<Vertex, uint32_t> uniqueVertices;
+            std::vector<Vertex> vertices;
+            std::vector<uint32_t> indices;
+            vertices.reserve(vertexIndices.size());
+            indices.reserve(vertexIndices.size());
+            uniqueVertices.reserve(vertexIndices.size());
 
-            glm::vec2 u0 = v1.uv - v0.uv;
-            glm::vec2 u1 = v2.uv - v0.uv;
+            for (const auto& index : vertexIndices) {
+                Vertex v;
+                v.position = { attrib.vertices[3 * index.vertex_index],
+                               attrib.vertices[3 * index.vertex_index + 1],
+                               attrib.vertices[3 * index.vertex_index + 2] };
+                if (index.normal_index >= 0) {
+                    v.normal = { attrib.normals[3 * index.normal_index],
+                                 attrib.normals[3 * index.normal_index + 1],
+                                 attrib.normals[3 * index.normal_index + 2] };
+                }
+                if (index.texcoord_index >= 0) {
+                    v.uv = { attrib.texcoords[2 * index.texcoord_index],
+                             1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
+                }
+                if (!uniqueVertices.contains(v)) {
+                    uniqueVertices[v] = vertices.size();
+                    vertices.push_back(v);
+                }
+                indices.push_back(uniqueVertices[v]);
+            }
 
-            float f = (u0.x * u1.y) - (u1.x * u0.y);
-            if (fabs(f) < 1e-6f) continue;
-            f = 1.0 / f;
-            glm::vec3 tangent = f * (u1.y * e0 - u0.y * e1);
+            for (int i = 0; i < indices.size(); i += 3) {
+                Vertex& v0 = vertices[indices[i]];
+                Vertex& v1 = vertices[indices[i + 1]];
+                Vertex& v2 = vertices[indices[i + 2]];
 
-            v0.tangent += tangent;
-            v1.tangent += tangent;
-            v2.tangent += tangent;
+                glm::vec3 e0 = v1.position - v0.position;
+                glm::vec3 e1 = v2.position - v0.position;
+
+                glm::vec2 u0 = v1.uv - v0.uv;
+                glm::vec2 u1 = v2.uv - v0.uv;
+
+                float f = (u0.x * u1.y) - (u1.x * u0.y);
+                if (fabs(f) < 1e-6f) continue;
+                f = 1.0 / f;
+                glm::vec3 tangent = f * (u1.y * e0 - u0.y * e1);
+
+                v0.tangent += tangent;
+                v1.tangent += tangent;
+                v2.tangent += tangent;
+            }
+
+            MeshData data;
+            data.m_vertices = std::move(vertices);
+            data.m_indices = std::move(indices);
+            data.m_materialId = matId;
+
+            m_meshIndices.push_back(AssetManager::g_meshData.size());
+            AssetManager::g_meshData.push_back(std::move(data));
         }
-
-        MeshData data;
-        data.m_vertices = vertices;
-        data.m_indices = indices;
-        data.m_materialId = shape.mesh.material_ids[0];
-
-        m_meshIndices.push_back(AssetManager::g_meshData.size());
-        AssetManager::g_meshData.push_back(std::move(data));
-
-        vertices.clear();
-        indices.clear();
-        uniqueVertices.clear();
     }
     LoadMaterials(materials);
     InitDefaultMaterial();
 }
 
 void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
+    m_materials.reserve(materials.size());
     for (const auto& material : materials) {
         Material mat;
         mat.m_name = material.name;
@@ -126,8 +133,7 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
             std::replace(path.begin(), path.end(), '\\', '/');
             tex.Load(m_directory + path);
             mat.m_diffuseMap = tex;
-        }
-        else {
+        } else {
             tex.Load("res/textures/fallbacks/missing_texture.png");
             mat.m_diffuseMap = tex;
         }

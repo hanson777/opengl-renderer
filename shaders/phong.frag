@@ -26,7 +26,7 @@ uniform vec3 Ka;
 uniform vec3 Kd;
 uniform vec3 Ks;
 uniform Material material;
-uniform Light lights[2];
+uniform Light lights[3];
 
 vec3 calcPointLight(Light light, vec3 N, vec3 V) {
   vec3 L = normalize(light.position - fragPos);
@@ -49,6 +49,7 @@ vec3 calcPointLight(Light light, vec3 N, vec3 V) {
 }
 
 void main() {
+  if (texture(material.diffuse, uv).a < 0.1) discard;
   // vec3 N = texture(material.normal, uv).rgb;
   // N = normalize(TBN * (N * 2) - 1);
   vec3 N = normalize(normal);

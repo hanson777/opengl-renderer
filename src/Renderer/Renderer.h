@@ -10,7 +10,7 @@ namespace Renderer {
 
 	void Init();
 
-	void UploadMesh(Mesh& mesh);
+	void UploadMesh(Mesh& mesh, const MeshData& data);
 	void UploadTexture(Texture& texture);
 	void Upload();
 
