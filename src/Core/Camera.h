@@ -12,6 +12,8 @@ class Camera {
     void ProcessMouseScroll(float yoffset);
     glm::mat4 GetViewMatrix() const;
     glm::vec3 GetPosition() const { return m_pos; }
+    glm::vec3 GetFront() const { return m_front; }
+    glm::vec3 GetFlatFront() const { return m_flatFront; };
     float GetFov() const { return m_zoom; }
 
   private:

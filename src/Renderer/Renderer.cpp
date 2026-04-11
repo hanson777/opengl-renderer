@@ -10,6 +10,7 @@
 #include "../Core/Shader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
 
@@ -139,14 +140,25 @@ namespace Renderer {
                 shader->setMat4("view", view);
                 shader->setMat4("projection", projection);
                 shader->setVec3("viewPos", Scene::g_camera.GetPosition());
+                shader->setInt("lightCount", Scene::g_lights.size());
 
                 for (int i = 0; i < Scene::g_lights.size(); i++) {
                     const Light& light = Scene::g_lights[i];
-                    shader->setVec3("lights[" + std::to_string(i) + "].position", light.position);
-                    shader->setVec3("lights[" + std::to_string(i) + "].direction", light.direction);
-                    shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
-                    shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
-                    shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
+                    if (light.type == LightType::Spot) {
+                        shader->setVec3("lights[" + std::to_string(i) + "].position", Scene::g_camera.GetPosition());
+                        shader->setVec3("lights[" + std::to_string(i) + "].direction", Scene::g_camera.GetFront());
+                        shader->setFloat("lights[" + std::to_string(i) + "].innerCutoff", glm::cos(light.innerCutoff));
+                        shader->setFloat("lights[" + std::to_string(i) + "].outerCutoff", glm::cos(light.outerCutoff));
+                        shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
+                        shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                        shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
+                    } else {
+                        shader->setVec3("lights[" + std::to_string(i) + "].position", light.position);
+                        shader->setVec3("lights[" + std::to_string(i) + "].direction", light.direction);
+                        shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
+                        shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                        shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
+                    } 
                 }
             }
 
@@ -163,7 +175,7 @@ namespace Renderer {
                 BindMesh(*mesh);
 
                 shader->setMat4("model", modelMatrix);
-                shader->setVec3("Ka", mat.m_ambient);
+                shader->setVec3("Ka", glm::vec3(0.01));
                 shader->setVec3("Kd", mat.m_diffuse);
                 shader->setVec3("Ks", mat.m_specular);
                 shader->setFloat("material.shininess", mat.m_shininess);

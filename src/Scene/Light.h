@@ -10,4 +10,6 @@ struct Light {
     glm::vec3 color;
     float intensity;
     float radius;
+    float innerCutoff;
+    float outerCutoff;
 };

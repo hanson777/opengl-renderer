@@ -34,6 +34,17 @@ namespace Game {
         // dirLight.direction = glm::vec3(0, -1, 0);
         // dirLight.intensity = 0.3f;
         // Scene::g_lights.push_back(dirLight);
+
+        Light flashlight;
+        flashlight.type = LightType::Spot;
+        flashlight.color = glm::vec3(1, 1, 1);
+        flashlight.intensity = 0.9;
+        flashlight.innerCutoff = glm::radians(12.5);
+        flashlight.outerCutoff = glm::radians(17.5); 
+        flashlight.position = Scene::g_camera.GetPosition();
+        flashlight.direction = Scene::g_camera.GetFront();
+        flashlight.radius = 100;
+        Scene::g_lights.push_back(flashlight);
         
         Light pointLight;
         pointLight.type = LightType::Point;
@@ -52,8 +63,8 @@ namespace Game {
         mat.m_normalMap.Load("res/textures/red_brick/red_brick_nor_gl_4k.png");
 
         for (int i = 0; i < 10; i++) {
-            brick.m_position.x = i*15;
-            Scene::g_sceneObjects.push_back(brick);
+            // brick.m_position.x = i*15;
+            // Scene::g_sceneObjects.push_back(brick);
             pointLight.position.x = i*15;
             if (i % 3 == 0) { pointLight.color = glm::vec3(1, 0, 0); lightCube.m_shaderIndex = redIdx; }
             if (i % 3 == 1) { pointLight.color = glm::vec3(0, 1, 0); lightCube.m_shaderIndex = greenIdx; }
