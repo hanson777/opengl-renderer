@@ -3,7 +3,7 @@
 #include <tiny_obj_loader.h>
 #include <vector>
 
-class Model {
+struct Model {
 public:
     Model(const std::string& filepath);
 

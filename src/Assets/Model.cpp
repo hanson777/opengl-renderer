@@ -30,8 +30,7 @@ void Model::Load(const std::string& path) {
 
     m_directory = path.substr(0, path.find_last_of("/\\")) + "/";
 
-    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), m_directory.c_str());
-    if (!success) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), m_directory.c_str())) {
         std::cout << "[ERROR::MODEL] " << err << std::endl;
         return;
     }
@@ -40,8 +39,8 @@ void Model::Load(const std::string& path) {
         std::cout << "[ERROR::MODEL::NON_FATAL] " << err << std::endl;
     }
 
-    std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << std::endl;
-    std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << std::endl;
+    std::cout << "Total face vertices: " << attrib.vertices.size() / 3 << '\n';
+    std::cout << "Total face indices: " << shapes[0].mesh.indices.size() / 3 << '\n';
 
     for (const auto& shape : shapes) {
 
@@ -121,35 +120,30 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
     m_materials.reserve(materials.size());
     for (const auto& material : materials) {
         Material mat;
-        mat.m_name = material.name;
-        mat.m_ambient = glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]);
-        mat.m_diffuse = glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-        mat.m_specular = glm::vec3(material.specular[0], material.specular[1], material.specular[2]);
-        mat.m_shininess = material.shininess;
+        mat.name = material.name;
+        mat.ambient = glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]);
+        mat.diffuse = glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+        mat.specular = glm::vec3(material.specular[0], material.specular[1], material.specular[2]);
+        mat.shininess = material.shininess;
 
-        Texture tex;
         if (!material.diffuse_texname.empty()) {
             std::string path = material.diffuse_texname;
             std::replace(path.begin(), path.end(), '\\', '/');
-            tex.Load(m_directory + path);
-            mat.m_diffuseMap = tex;
+            mat.diffuseMap.Load(m_directory + path);
         } else {
-            tex.Load("res/textures/fallbacks/missing_texture.png");
-            mat.m_diffuseMap = tex;
+            mat.diffuseMap.Load("res/textures/fallbacks/missing_texture.png");
         }
 
         if (!material.specular_texname.empty()) {
             std::string path = material.specular_texname;
             std::replace(path.begin(), path.end(), '\\', '/');
-            tex.Load(m_directory + path);
-            mat.m_specularMap = tex;
+            mat.specularMap.Load(m_directory + path);
         }
 
         if (!material.normal_texname.empty()) {
             std::string path = material.normal_texname;
             std::replace(path.begin(), path.end(), '\\', '/');
-            tex.Load(m_directory + path);
-            mat.m_normalMap = tex;
+            mat.normalMap.Load(m_directory + path);
         }
 
         m_materials.push_back(mat);
@@ -157,15 +151,12 @@ void Model::LoadMaterials(const std::vector<tinyobj::material_t>& materials) {
 }
 
 void Model::InitDefaultMaterial() {
-    m_defaultMaterial.m_name = "Default";
-    m_defaultMaterial.m_ambient = glm::vec3(0.1f);
-    m_defaultMaterial.m_diffuse = glm::vec3(1.0f);
-    m_defaultMaterial.m_specular = glm::vec3(0.0f);
-    m_defaultMaterial.m_shininess = 1.0f;
+    m_defaultMaterial.name = "Default";
+    m_defaultMaterial.ambient = glm::vec3(0.1f);
+    m_defaultMaterial.diffuse = glm::vec3(1.0f);
+    m_defaultMaterial.specular = glm::vec3(0.0f);
+    m_defaultMaterial.shininess = 1.0f;
 
-    Texture tex;
-    tex.Load("res/textures/fallbacks/missing_texture.png");
-    m_defaultMaterial.m_diffuseMap = tex;
-    tex.GenerateWhiteTexture();
-    m_defaultMaterial.m_specularMap = tex;
+    m_defaultMaterial.diffuseMap.Load("res/textures/fallbacks/missing_texture.png");
+    m_defaultMaterial.specularMap.GenerateWhiteTexture();
 }

@@ -37,7 +37,7 @@ namespace Game {
 
         Light flashlight;
         flashlight.type = LightType::Spot;
-        flashlight.color = glm::vec3(1, 1, 1);
+        flashlight.color = glm::vec3(1, 0, 0);
         flashlight.intensity = 0.9;
         flashlight.innerCutoff = glm::radians(12.5);
         flashlight.outerCutoff = glm::radians(17.5); 
@@ -59,8 +59,8 @@ namespace Game {
         brick.m_position = lightCube.m_position;
         brick.m_position.z = lightCube.m_position.z + 5;
         Material& mat = AssetManager::GetModelByIndex(cubeIdx)->GetMaterials()[0];
-        mat.m_diffuseMap.Load("res/textures/red_brick/red_brick_diff_4k.jpg");
-        mat.m_normalMap.Load("res/textures/red_brick/red_brick_nor_gl_4k.png");
+        mat.diffuseMap.Load("res/textures/red_brick/red_brick_diff_4k.jpg");
+        mat.normalMap.Load("res/textures/red_brick/red_brick_nor_gl_4k.png");
 
         for (int i = 0; i < 10; i++) {
             // brick.m_position.x = i*15;

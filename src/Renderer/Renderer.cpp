@@ -84,13 +84,13 @@ namespace Renderer {
 
     void BindMaterial(const Material& material) {
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.m_diffuseMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.diffuseMap.GetId());
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, material.m_specularMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.specularMap.GetId());
 
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, material.m_normalMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.normalMap.GetId());
     }
 
     void Upload() {
@@ -102,15 +102,15 @@ namespace Renderer {
         AssetManager::g_meshData.clear();
         AssetManager::g_meshData.shrink_to_fit();
         for (Model& model : AssetManager::g_models) {
-            UploadTexture(model.GetDefaultMaterial().m_diffuseMap);
-            UploadTexture(model.GetDefaultMaterial().m_specularMap);
+            UploadTexture(model.GetDefaultMaterial().diffuseMap);
+            UploadTexture(model.GetDefaultMaterial().specularMap);
             for (Material& mat : model.GetMaterials()) {
-                if (!mat.m_diffuseMap.m_data.empty())
-                    UploadTexture(mat.m_diffuseMap);
-                if (!mat.m_specularMap.m_data.empty())
-                    UploadTexture(mat.m_specularMap);
-                if (!mat.m_normalMap.m_data.empty())
-                    UploadTexture(mat.m_normalMap);
+                if (!mat.diffuseMap.m_data.empty())
+                    UploadTexture(mat.diffuseMap);
+                if (!mat.specularMap.m_data.empty())
+                    UploadTexture(mat.specularMap);
+                if (!mat.normalMap.m_data.empty())
+                    UploadTexture(mat.normalMap);
             }
         }
     }
@@ -136,28 +136,28 @@ namespace Renderer {
             Shader* shader = GetShaderByIndex(sceneObject.m_shaderIndex);
             if (shader != currentShader) {
                 currentShader = shader;
-                shader->use();
-                shader->setMat4("view", view);
-                shader->setMat4("projection", projection);
-                shader->setVec3("viewPos", Scene::g_camera.GetPosition());
-                shader->setInt("lightCount", Scene::g_lights.size());
+                shader->Use();
+                shader->SetMat4("view", view);
+                shader->SetMat4("projection", projection);
+                shader->SetVec3("viewPos", Scene::g_camera.GetPosition());
+                shader->SetInt("lightCount", Scene::g_lights.size());
 
                 for (int i = 0; i < Scene::g_lights.size(); i++) {
                     const Light& light = Scene::g_lights[i];
                     if (light.type == LightType::Spot) {
-                        shader->setVec3("lights[" + std::to_string(i) + "].position", Scene::g_camera.GetPosition());
-                        shader->setVec3("lights[" + std::to_string(i) + "].direction", Scene::g_camera.GetFront());
-                        shader->setFloat("lights[" + std::to_string(i) + "].innerCutoff", glm::cos(light.innerCutoff));
-                        shader->setFloat("lights[" + std::to_string(i) + "].outerCutoff", glm::cos(light.outerCutoff));
-                        shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
-                        shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
-                        shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
+                        shader->SetVec3("lights[" + std::to_string(i) + "].position", Scene::g_camera.GetPosition());
+                        shader->SetVec3("lights[" + std::to_string(i) + "].direction", Scene::g_camera.GetFront());
+                        shader->SetFloat("lights[" + std::to_string(i) + "].innerCutoff", glm::cos(light.innerCutoff));
+                        shader->SetFloat("lights[" + std::to_string(i) + "].outerCutoff", glm::cos(light.outerCutoff));
+                        shader->SetVec3("lights[" + std::to_string(i) + "].color", light.color);
+                        shader->SetFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                        shader->SetFloat("lights[" + std::to_string(i) + "].radius", light.radius);
                     } else {
-                        shader->setVec3("lights[" + std::to_string(i) + "].position", light.position);
-                        shader->setVec3("lights[" + std::to_string(i) + "].direction", light.direction);
-                        shader->setVec3("lights[" + std::to_string(i) + "].color", light.color);
-                        shader->setFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
-                        shader->setFloat("lights[" + std::to_string(i) + "].radius", light.radius);
+                        shader->SetVec3("lights[" + std::to_string(i) + "].position", light.position);
+                        shader->SetVec3("lights[" + std::to_string(i) + "].direction", light.direction);
+                        shader->SetVec3("lights[" + std::to_string(i) + "].color", light.color);
+                        shader->SetFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
+                        shader->SetFloat("lights[" + std::to_string(i) + "].radius", light.radius);
                     } 
                 }
             }
@@ -174,14 +174,14 @@ namespace Renderer {
                 BindMaterial(mat);
                 BindMesh(*mesh);
 
-                shader->setMat4("model", modelMatrix);
-                shader->setVec3("Ka", glm::vec3(0.01));
-                shader->setVec3("Kd", mat.m_diffuse);
-                shader->setVec3("Ks", mat.m_specular);
-                shader->setFloat("material.shininess", mat.m_shininess);
-                shader->setInt("material.diffuse", 0);
-                shader->setInt("material.specular", 1);
-                shader->setInt("material.normal", 2);
+                shader->SetMat4("model", modelMatrix);
+                shader->SetVec3("Ka", glm::vec3(0.01));
+                shader->SetVec3("Kd", mat.diffuse);
+                shader->SetVec3("Ks", mat.specular);
+                shader->SetFloat("material.shininess", mat.shininess);
+                shader->SetInt("material.diffuse", 0);
+                shader->SetInt("material.specular", 1);
+                shader->SetInt("material.normal", 2);
 
                 glDrawElements(GL_TRIANGLES, mesh->m_indexCount, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
