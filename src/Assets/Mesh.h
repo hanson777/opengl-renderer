@@ -27,15 +27,15 @@ struct std::hash<Vertex> {
 };
 
 struct MeshData {
-    std::vector<Vertex> m_vertices;
-    std::vector<uint32_t> m_indices;
-    int m_materialId = -1;
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+    int materialId = -1;
 };
 
 struct Mesh {
-      uint32_t m_vao = 0;
-      uint32_t m_vbo = 0;
-      uint32_t m_ebo = 0;
-      uint32_t m_indexCount = 0;
-      int m_materialId = -1;
+      uint32_t vao = 0;
+      uint32_t vbo = 0;
+      uint32_t ebo = 0;
+      uint32_t indexCount = 0;
+      int materialId = -1;
 };

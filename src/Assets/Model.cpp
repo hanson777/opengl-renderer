@@ -104,9 +104,9 @@ void Model::Load(const std::string& path) {
             }
 
             MeshData data;
-            data.m_vertices = std::move(vertices);
-            data.m_indices = std::move(indices);
-            data.m_materialId = matId;
+            data.vertices = std::move(vertices);
+            data.indices = std::move(indices);
+            data.materialId = matId;
 
             m_meshIndices.push_back(AssetManager::g_meshData.size());
             AssetManager::g_meshData.push_back(std::move(data));

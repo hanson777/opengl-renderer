@@ -32,20 +32,20 @@ namespace Renderer {
     }
 
     void UploadMesh(Mesh& mesh, const MeshData& data) {
-        mesh.m_indexCount = data.m_indices.size();
-        mesh.m_materialId = data.m_materialId;
+        mesh.indexCount = data.indices.size();
+        mesh.materialId = data.materialId;
 
-        glGenVertexArrays(1, &mesh.m_vao);
-        glGenBuffers(1, &mesh.m_vbo);
-        glGenBuffers(1, &mesh.m_ebo);
+        glGenVertexArrays(1, &mesh.vao);
+        glGenBuffers(1, &mesh.vbo);
+        glGenBuffers(1, &mesh.ebo);
 
-        glBindVertexArray(mesh.m_vao);
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vbo);
+        glBindVertexArray(mesh.vao);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
 
-        glBufferData(GL_ARRAY_BUFFER, data.m_vertices.size() * sizeof(Vertex), &data.m_vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.vertices.size() * sizeof(Vertex), &data.vertices[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.m_indices.size() * sizeof(uint32_t), &data.m_indices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(uint32_t), &data.indices[0], GL_STATIC_DRAW);
 
         // vertex positions
         glEnableVertexAttribArray(0);
@@ -64,19 +64,19 @@ namespace Renderer {
     }
 
     void BindMesh(const Mesh& mesh) {
-        glBindVertexArray(mesh.m_vao);
+        glBindVertexArray(mesh.vao);
     }
 
     void UploadTexture(Texture& texture) {
-        glGenTextures(1, &texture.m_id);
-        glBindTexture(GL_TEXTURE_2D, texture.m_id);
+        glGenTextures(1, &texture.id);
+        glBindTexture(GL_TEXTURE_2D, texture.id);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, texture.GetInternalFormat(), texture.GetWidth(), texture.GetHeight(), 0, texture.GetFormat(), GL_UNSIGNED_BYTE, texture.GetRawData());
+        glTexImage2D(GL_TEXTURE_2D, 0, texture.internalFormat, texture.width, texture.height, 0, texture.format, GL_UNSIGNED_BYTE, texture.GetRawData());
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -84,13 +84,13 @@ namespace Renderer {
 
     void BindMaterial(const Material& material) {
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.diffuseMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, material.specularMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, material.normalMap.GetId());
+        glBindTexture(GL_TEXTURE_2D, material.normalMap.id);
     }
 
     void Upload() {
@@ -105,11 +105,11 @@ namespace Renderer {
             UploadTexture(model.GetDefaultMaterial().diffuseMap);
             UploadTexture(model.GetDefaultMaterial().specularMap);
             for (Material& mat : model.GetMaterials()) {
-                if (!mat.diffuseMap.m_data.empty())
+                if (!mat.diffuseMap.data.empty())
                     UploadTexture(mat.diffuseMap);
-                if (!mat.specularMap.m_data.empty())
+                if (!mat.specularMap.data.empty())
                     UploadTexture(mat.specularMap);
-                if (!mat.normalMap.m_data.empty())
+                if (!mat.normalMap.data.empty())
                     UploadTexture(mat.normalMap);
             }
         }
@@ -168,8 +168,8 @@ namespace Renderer {
                 int meshIndex = model->m_meshIndices[i];
                 Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
 
-                const Material& mat = (mesh->m_materialId != -1) ? 
-                    model->GetMaterials()[mesh->m_materialId] : model->GetDefaultMaterial();
+                const Material& mat = (mesh->materialId != -1) ? 
+                    model->GetMaterials()[mesh->materialId] : model->GetDefaultMaterial();
 
                 BindMaterial(mat);
                 BindMesh(*mesh);
@@ -183,7 +183,7 @@ namespace Renderer {
                 shader->SetInt("material.specular", 1);
                 shader->SetInt("material.normal", 2);
 
-                glDrawElements(GL_TRIANGLES, mesh->m_indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }
         }
