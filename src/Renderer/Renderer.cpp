@@ -31,6 +31,36 @@ namespace Renderer {
         return index;
     }
 
+    void CreateFramebuffer() {
+        uint32_t fbo;
+        glGenFramebuffers(1, &fbo);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        uint32_t texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+        uint32_t rbo;
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920, 1080);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            std::cout << "[ERROR::RENDERER] framebuffer incomplete" << std::endl;
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     void UploadMesh(Mesh& mesh, const MeshData& data) {
         mesh.indexCount = data.indices.size();
         mesh.materialId = data.materialId;
@@ -120,12 +150,41 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-        // glClearColor(0.38f, 0.59f, 0.94f, 1.0f);
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
+
+        uint32_t fbo;
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        Texture tex;
+        tex.width = 1920;
+        tex.height = 1080;
+        tex.format = GL_RGBA8;
+        tex.internalFormat = GL_RGBA8;
+        UploadTexture(tex);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.id, 0);
+
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            std::cout << "[ERROR::RENDERER] framebuffer incomplete: " << status << std::endl; 
+            exit(1);
+        }
+
+        // int pass{0};
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glClearColor(0.1, 0.2, 0.3, 1.0);
+
+        // if (pass != 0) {
+        //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //     glClearColor(0,0,0,1);
+        // }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         Shader* currentShader = nullptr;
 
@@ -187,6 +246,7 @@ namespace Renderer {
                 glBindVertexArray(0);
             }
         }
+        // pass++;
     }
 
     Shader* GetShaderByIndex(int index) {
