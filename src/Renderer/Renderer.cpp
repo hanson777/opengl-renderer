@@ -18,10 +18,13 @@ namespace Renderer {
     std::vector<Shader> g_shaders;
     float g_deltaTime = 0.0f;
     float g_lastFrame = 0.0f;
+    uint32_t g_fbo = 0;
+    uint32_t g_rbo = 0;
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         g_lastFrame = glfwGetTime();
     }
 
@@ -32,33 +35,30 @@ namespace Renderer {
     }
 
     void CreateFramebuffer() {
-        uint32_t fbo;
-        glGenFramebuffers(1, &fbo);
+        glGenFramebuffers(1, &g_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        Texture tex;
+        tex.width = 1920;
+        tex.height = 1080;
+        tex.format = GL_RGBA;
+        tex.internalFormat = GL_RGBA8;
+        UploadTexture(tex);
 
-        uint32_t texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.id, 0);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-        uint32_t rbo;
-        glGenRenderbuffers(1, &rbo);
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glGenRenderbuffers(1, &g_rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, g_rbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920, 1080);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, g_rbo);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cout << "[ERROR::RENDERER] framebuffer incomplete" << std::endl;
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            std::cout << "[ERROR::RENDERER] framebuffer incomplete: " << status << std::endl;
+            exit(1);
         }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void UploadMesh(Mesh& mesh, const MeshData& data) {
@@ -129,8 +129,10 @@ namespace Renderer {
             UploadMesh(mesh, data);
             AssetManager::g_meshes.push_back(mesh);
         }
+
         AssetManager::g_meshData.clear();
         AssetManager::g_meshData.shrink_to_fit();
+
         for (Model& model : AssetManager::g_models) {
             UploadTexture(model.GetDefaultMaterial().diffuseMap);
             UploadTexture(model.GetDefaultMaterial().specularMap);
@@ -145,6 +147,35 @@ namespace Renderer {
         }
     }
 
+    void UploadQuadData() {
+        float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in ndc
+            // positions   // uvs
+            -1.0f,  1.0f,  0.0f, 1.0f, // top left
+             1.0f,  1.0f,  0.0f, 0.0f, // top right
+            -1.0f, -1.0f,  1.0f, 0.0f, // bottom left
+             1.0f, -1.0f,  0.0f, 1.0f, // bottom right
+        };
+
+        MeshData md;
+        md.indices = { 0, 1, 2, 1, 3, 2 };
+
+        for (int i = 0; i < 6; i++) {
+            Vertex v;
+            v.position = { quadVertices[i * 4],     quadVertices[i * 4 + 1], 0 };
+            v.uv       = { quadVertices[i * 4 + 2], quadVertices[i * 4 + 3] }; 
+            md.vertices.push_back(v);
+        }
+         
+        Mesh mesh;
+        UploadMesh(mesh, md);
+
+        AssetManager::g_meshes.push_back(mesh);
+    }
+
+    void DrawQuad() {
+        
+    }
+
     void RenderFrame() {
         float currentFrame = glfwGetTime();
         g_deltaTime = currentFrame - g_lastFrame;
@@ -153,38 +184,10 @@ namespace Renderer {
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
-
-        uint32_t fbo;
-        glGenFramebuffers(1, &fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-        Texture tex;
-        tex.width = 1920;
-        tex.height = 1080;
-        tex.format = GL_RGBA8;
-        tex.internalFormat = GL_RGBA8;
-        UploadTexture(tex);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.id, 0);
-
-        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE) {
-            std::cout << "[ERROR::RENDERER] framebuffer incomplete: " << status << std::endl; 
-            exit(1);
-        }
-
-        // int pass{0};
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-        glClearColor(0.1, 0.2, 0.3, 1.0);
-
-        // if (pass != 0) {
-        //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        //     glClearColor(0,0,0,1);
-        // }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         Shader* currentShader = nullptr;
 
@@ -246,7 +249,6 @@ namespace Renderer {
                 glBindVertexArray(0);
             }
         }
-        // pass++;
     }
 
     Shader* GetShaderByIndex(int index) {

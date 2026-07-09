@@ -5,7 +5,7 @@
 #include "src/Game/Game.h"
 
 int main() {
-    Window window(1920, 1080, "hi");
+    Window window(1920, 1080, "");
 
     Renderer::Init();
     Game::Init();

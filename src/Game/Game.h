@@ -2,4 +2,5 @@
 
 namespace Game {
     void Init();
+    void InitPrimitives();
 }
