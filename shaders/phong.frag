@@ -1,20 +1,20 @@
 #version 410 core
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
-	float shininess;
-  sampler2D normal;
+    sampler2D diffuse;
+    sampler2D specular;
+    float shininess;
+    sampler2D normal;
 };
 
 struct Light {
-  int type;
-	vec3 position;
-  vec3 direction;
-  vec3 color;
-  float intensity;
-  float radius;
-  float innerCutoff;
-  float outerCutoff;
+    int type;
+    vec3 position;
+    vec3 direction;
+    vec3 color;
+    float intensity;
+    float radius;
+    float innerCutoff;
+    float outerCutoff;
 };
 
 out vec4 FragColor;

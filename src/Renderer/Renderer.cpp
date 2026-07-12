@@ -24,9 +24,9 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
-        // glFrontFace(GL_CCW);
-        // glCullFace(GL_BACK);
-        // glEnable(GL_CULL_FACE);
+         glFrontFace(GL_CCW);
+         glCullFace(GL_BACK);
+         glEnable(GL_CULL_FACE);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         CreateFramebuffer();
@@ -43,20 +43,20 @@ namespace Renderer {
         glGenFramebuffers(1, &g_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
-        // Texture tex;
-        // tex.width = 1920;
-        // tex.height = 1080;
-        // tex.format = GL_RGB;
-        // tex.internalFormat = GL_RGB;
-        // UploadTexture(tex);
-        // g_textureColorbuffer = tex.id;
+         Texture tex;
+         tex.width = 1920;
+         tex.height = 1080;
+         tex.format = GL_RGB;
+         tex.internalFormat = GL_RGB;
+         UploadTexture(tex);
+         g_textureColorbuffer = tex.id;
 
-        glGenTextures(1, &g_textureColorbuffer);
+        /*glGenTextures(1, &g_textureColorbuffer);
         glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);*/
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_textureColorbuffer, 0);
 
@@ -168,6 +168,7 @@ namespace Renderer {
         for (ScreenSpaceObject& ssObject : Scene::g_screenSpaceObjects) {
             Shader* shader = Renderer::GetShaderByIndex(ssObject.shaderIndex);
             shader->Use();
+            shader->SetInt("screenTexture", 3);
 
             Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(ssObject.meshIndex);
             glBindVertexArray(mesh->vao);
@@ -256,6 +257,7 @@ namespace Renderer {
         glClearColor(1, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
+        glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
         DrawScreenSpaceObject();
     }

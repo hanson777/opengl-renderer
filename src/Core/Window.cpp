@@ -33,7 +33,7 @@ Window::Window(int width, int height, const char* title) : m_width(width), m_hei
     Input::SetWindow(m_window);
 
     glfwMaximizeWindow(m_window);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 }
 
 void Window::BeginFrame() {
