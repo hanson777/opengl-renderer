@@ -1,8 +1,10 @@
+#pragma once
 #include "Mesh.h"
 
 enum class PrimitiveType { Quad };
 
 struct Primitive {
-	MeshData mesh;
-	int shaderIdx = -1;
+	MeshData data;
+	int shaderIndex = -1;
+	int meshIndex = -1;
 };

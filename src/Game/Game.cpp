@@ -1,9 +1,11 @@
 #include "Game.h"
 #include "../Renderer/Renderer.h"
 #include "../Assets/AssetManager.h"
+#include "../Assets/Primitive.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneObject.h"
 #include "../Scene/Light.h"
+#include <iostream>
 
 namespace Game {
     void Init() {
@@ -15,17 +17,22 @@ namespace Game {
 
         int sponzaIdx = AssetManager::LoadModel("res/sponza/sponza.obj");
         SceneObject sponza;
-        sponza.m_modelIndex = sponzaIdx;
-        sponza.m_shaderIndex = phongIdx;
-        sponza.m_scale = glm::vec3(0.1f);
+        sponza.modelIndex = sponzaIdx;
+        sponza.shaderIndex = phongIdx;
+        sponza.scale = glm::vec3(0.1f);
         Scene::g_sceneObjects.push_back(sponza);
 
         Scene::g_camera = Camera(glm::vec3(0.0f, 2.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     void InitPrimitives() {
-        int ndcIndex = Renderer::LoadShader("shaders/quad.vert", "shaders/quad.frag");
+        int ndcIdx = Renderer::LoadShader("shaders/quad.vert", "shaders/quad.frag");
 
-        int quadIdx = AssetManager::LoadQuad();
+        int quadIdx = AssetManager::LoadPrimitive(PrimitiveType::Quad);
+
+        ScreenSpaceObject screenSpaceQuad;
+        screenSpaceQuad.primitiveIndex = quadIdx;
+        screenSpaceQuad.shaderIndex = ndcIdx;
+        Scene::g_screenSpaceObjects.push_back(screenSpaceQuad);
     }
 }

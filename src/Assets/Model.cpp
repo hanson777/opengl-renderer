@@ -109,7 +109,7 @@ void Model::Load(const std::string& path) {
             data.materialId = matId;
 
             m_meshIndices.push_back(AssetManager::g_meshData.size());
-            AssetManager::g_meshData.push_back(std::move(data));
+            AssetManager::g_meshData.push_back(data);
         }
     }
     LoadMaterials(materials);

@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "../Assets/Model.h"
 #include "../Assets/Mesh.h"
+#include "../Assets/Primitive.h"
 #include "../Assets/Material.h"
 #include "../Assets/Texture.h"
 #include "../Assets/AssetManager.h"
@@ -23,8 +24,8 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glEnable(GL_CULL_FACE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         g_lastFrame = glfwGetTime();
     }
 
@@ -130,6 +131,18 @@ namespace Renderer {
             AssetManager::g_meshes.push_back(mesh);
         }
 
+        for (Primitive& p : AssetManager::g_primitives) {
+            Mesh mesh;
+            UploadMesh(mesh, p.data);
+
+            int index = AssetManager::g_primitiveMeshes.size();
+            p.meshIndex = index;
+            AssetManager::g_primitiveMeshes.push_back(mesh);
+
+            p.data.indices.clear();
+            p.data.vertices.clear();
+        }
+
         AssetManager::g_meshData.clear();
         AssetManager::g_meshData.shrink_to_fit();
 
@@ -147,10 +160,20 @@ namespace Renderer {
         }
     }
 
-    void RenderScreenSpaceQuad() {
+    void DrawScreenSpaceObject() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        
+        for (ScreenSpaceObject& ssObject : Scene::g_screenSpaceObjects) {
+            Shader* shader = Renderer::GetShaderByIndex(ssObject.shaderIndex);
+            shader->Use();
+
+            Primitive* p = AssetManager::GetPrimitiveByIndex(ssObject.primitiveIndex);
+            Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(p->meshIndex);
+            BindMesh(*mesh);
+
+            glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
     }
 
     void RenderFrame() {
@@ -158,10 +181,12 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
-        glClearColor(0, 0, 0, 1);
+        glClearColor(0, 1, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+        DrawScreenSpaceObject();
+
+        /*glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
@@ -172,7 +197,7 @@ namespace Renderer {
 
             glm::mat4 modelMatrix = sceneObject.GetModelMatrix();
 
-            Shader* shader = GetShaderByIndex(sceneObject.m_shaderIndex);
+            Shader* shader = GetShaderByIndex(sceneObject.shaderIndex);
             if (shader != currentShader) {
                 currentShader = shader;
                 shader->Use();
@@ -201,7 +226,7 @@ namespace Renderer {
                 }
             }
 
-            Model* model = AssetManager::GetModelByIndex(sceneObject.m_modelIndex);
+            Model* model = AssetManager::GetModelByIndex(sceneObject.modelIndex);
             for (int i = 0; i < model->m_meshIndices.size(); i++) {
 
                 int meshIndex = model->m_meshIndices[i];
@@ -225,7 +250,7 @@ namespace Renderer {
                 glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }
-        }
+        }*/
     }
 
     Shader* GetShaderByIndex(int index) {

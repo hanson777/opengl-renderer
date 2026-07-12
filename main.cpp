@@ -8,7 +8,7 @@ int main() {
     Window window(1920, 1080, "");
 
     Renderer::Init();
-    Game::Init();
+    Game::InitPrimitives();
     Renderer::Upload();
 
     while (!window.ShouldClose()) {
