@@ -1,11 +1,9 @@
 #include "Game.h"
 #include "../Renderer/Renderer.h"
 #include "../Assets/AssetManager.h"
-#include "../Assets/Primitive.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneObject.h"
 #include "../Scene/Light.h"
-#include <iostream>
 
 namespace Game {
     void Init() {
@@ -28,10 +26,10 @@ namespace Game {
     void InitPrimitives() {
         int ndcIdx = Renderer::LoadShader("shaders/quad.vert", "shaders/quad.frag");
 
-        int quadIdx = AssetManager::LoadPrimitive(PrimitiveType::Quad);
+        int quadIdx = AssetManager::LoadMeshData(MeshType::Quad);
 
         ScreenSpaceObject screenSpaceQuad;
-        screenSpaceQuad.primitiveIndex = quadIdx;
+        screenSpaceQuad.meshIndex = quadIdx;
         screenSpaceQuad.shaderIndex = ndcIdx;
         Scene::g_screenSpaceObjects.push_back(screenSpaceQuad);
     }

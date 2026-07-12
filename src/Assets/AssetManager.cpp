@@ -1,7 +1,6 @@
 #include "AssetManager.h"
 #include "Model.h"
 #include "Mesh.h"
-#include "Primitive.h"
 #include <vector>
 #include <iostream>
 
@@ -9,8 +8,9 @@ namespace AssetManager {
 	std::vector<Model> g_models;
 	std::vector<Mesh> g_meshes;
 	std::vector<MeshData> g_meshData;
-	std::vector<Primitive> g_primitives;
+
 	std::vector<Mesh> g_primitiveMeshes;
+    std::vector<MeshData> g_primitiveMeshData;
 
 	int LoadModel(const std::string& filepath) {
 		int index = g_models.size();
@@ -18,15 +18,15 @@ namespace AssetManager {
 		return index;
 	}
 
-	int LoadPrimitive(PrimitiveType type) {
-		int index = g_primitives.size();
-		if (type == PrimitiveType::Quad) {
-			g_primitives.push_back(CreateQuad());
+	int LoadMeshData(MeshType type) {
+		int index = g_primitiveMeshes.size();
+		if (type == MeshType::Quad) {
+			g_primitiveMeshData.push_back(CreateQuad());
 		}
 		return index;
 	}
 
-	Primitive CreateQuad() {
+	MeshData CreateQuad() {
 		MeshData data;
 		data.vertices = {
 			{
@@ -46,8 +46,8 @@ namespace AssetManager {
 				.uv       = { 0, 1 },
 			},
 		};
-		data.indices = { 0, 1, 2, 1, 3, 2 };
-		return { data, -1 };
+		data.indices = { 3, 1, 0, 3, 0, 2 };
+        return data;
 	}
 
 	Model* GetModelByIndex(int index) {
@@ -72,13 +72,5 @@ namespace AssetManager {
 			return nullptr;
 		}
 		return &g_primitiveMeshes[index];
-	}
-
-	Primitive* GetPrimitiveByIndex(int index) {
-		if (index < 0 || index >= g_primitives.size()) {
-			std::cout << "[ERROR::ASSET_MANAGER] GetPrimitiveByIndex out of bounds" << std::endl;
-			return nullptr;
-		}
-		return &g_primitives[index];
 	}
 }

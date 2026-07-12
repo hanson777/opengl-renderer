@@ -1,7 +1,6 @@
 #include "Renderer.h"
 #include "../Assets/Model.h"
 #include "../Assets/Mesh.h"
-#include "../Assets/Primitive.h"
 #include "../Assets/Material.h"
 #include "../Assets/Texture.h"
 #include "../Assets/AssetManager.h"
@@ -24,7 +23,9 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
-        // glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         g_lastFrame = glfwGetTime();
     }
@@ -94,10 +95,6 @@ namespace Renderer {
         glBindVertexArray(0);
     }
 
-    void BindMesh(const Mesh& mesh) {
-        glBindVertexArray(mesh.vao);
-    }
-
     void UploadTexture(Texture& texture) {
         glGenTextures(1, &texture.id);
         glBindTexture(GL_TEXTURE_2D, texture.id);
@@ -131,20 +128,16 @@ namespace Renderer {
             AssetManager::g_meshes.push_back(mesh);
         }
 
-        for (Primitive& p : AssetManager::g_primitives) {
+        for (MeshData& data : AssetManager::g_primitiveMeshData) {
             Mesh mesh;
-            UploadMesh(mesh, p.data);
-
-            int index = AssetManager::g_primitiveMeshes.size();
-            p.meshIndex = index;
+            UploadMesh(mesh, data); 
             AssetManager::g_primitiveMeshes.push_back(mesh);
-
-            p.data.indices.clear();
-            p.data.vertices.clear();
         }
 
         AssetManager::g_meshData.clear();
         AssetManager::g_meshData.shrink_to_fit();
+        AssetManager::g_primitiveMeshData.clear();
+        AssetManager::g_primitiveMeshData.shrink_to_fit();
 
         for (Model& model : AssetManager::g_models) {
             UploadTexture(model.m_defaultMaterial.diffuseMap);
@@ -167,9 +160,8 @@ namespace Renderer {
             Shader* shader = Renderer::GetShaderByIndex(ssObject.shaderIndex);
             shader->Use();
 
-            Primitive* p = AssetManager::GetPrimitiveByIndex(ssObject.primitiveIndex);
-            Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(p->meshIndex);
-            BindMesh(*mesh);
+            Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(ssObject.meshIndex);
+            glBindVertexArray(mesh->vao);
 
             glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
@@ -236,7 +228,7 @@ namespace Renderer {
                     model->GetMaterials()[mesh->materialId] : model->GetDefaultMaterial();
 
                 BindMaterial(mat);
-                BindMesh(*mesh);
+                glBindVertexArray(mesh->vao);
 
                 shader->SetMat4("model", modelMatrix);
                 shader->SetVec3("Ka", glm::vec3(0.01));

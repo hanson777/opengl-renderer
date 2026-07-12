@@ -13,6 +13,6 @@ struct SceneObject {
 };
 
 struct ScreenSpaceObject {
-    int primitiveIndex = -1;
+    int meshIndex = -1;
     int shaderIndex = -1;
 };

@@ -39,3 +39,5 @@ struct Mesh {
       uint32_t indexCount = 0;
       int materialId = -1;
 };
+
+enum class MeshType { Quad };

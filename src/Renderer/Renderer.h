@@ -14,9 +14,9 @@ namespace Renderer {
 	void UploadTexture(Texture& texture);
 	void Upload();
 
-	void BindMesh(const Mesh& mesh);
 	void BindMaterial(const Material& material);
 
+    void DrawScreenSpaceObject();
 	void RenderFrame();
 
 	int LoadShader(const std::string& vert, const std::string& frag);
