@@ -1,6 +1,7 @@
 #include "AssetManager.h"
 #include "Model.h"
 #include "Mesh.h"
+#include "Primitive.h"
 #include <vector>
 #include <iostream>
 
@@ -8,6 +9,7 @@ namespace AssetManager {
 	std::vector<Model> g_models;
 	std::vector<Mesh> g_meshes;
 	std::vector<MeshData> g_meshData;
+	std::vector<Primitive> g_primitives;
 
 	int LoadModel(const std::string& filepath) {
 		int index = g_models.size();
@@ -15,15 +17,16 @@ namespace AssetManager {
 		return index;
 	}
 
-	int LoadQuad() {
-		//float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in ndc
-		//	// positions   // uvs
-		//	-1.0f,  1.0f,  0.0f, 1.0f, // top left
-		//	 1.0f,  1.0f,  0.0f, 0.0f, // top right
-		//	-1.0f, -1.0f,  1.0f, 0.0f, // bottom left
-		//	 1.0f, -1.0f,  0.0f, 1.0f, // bottom right
-		//};
+	int LoadPrimitive(PrimitiveType type) {
+		int index = g_primitives.size();
+		switch (type) {
+			case PrimitiveType::Quad:
+				g_primitives.push_back(CreateQuad());
+				break;
+		}
+	}
 
+	Primitive CreateQuad() {
 		MeshData data;
 		data.vertices = {
 			{
@@ -44,8 +47,8 @@ namespace AssetManager {
 			},
 		};
 		data.indices = { 0, 1, 2, 1, 3, 2 };
-
-		AssetManager::g_meshData.push_back(data);
+		Primitive p;
+		return p;
 	}
 
 	Model* GetModelByIndex(int index) {

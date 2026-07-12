@@ -134,9 +134,9 @@ namespace Renderer {
         AssetManager::g_meshData.shrink_to_fit();
 
         for (Model& model : AssetManager::g_models) {
-            UploadTexture(model.GetDefaultMaterial().diffuseMap);
-            UploadTexture(model.GetDefaultMaterial().specularMap);
-            for (Material& mat : model.GetMaterials()) {
+            UploadTexture(model.m_defaultMaterial.diffuseMap);
+            UploadTexture(model.m_defaultMaterial.specularMap);
+            for (Material& mat : model.m_materials) {
                 if (!mat.diffuseMap.data.empty())
                     UploadTexture(mat.diffuseMap);
                 if (!mat.specularMap.data.empty())
@@ -147,32 +147,9 @@ namespace Renderer {
         }
     }
 
-    void UploadQuadData() {
-        float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in ndc
-            // positions   // uvs
-            -1.0f,  1.0f,  0.0f, 1.0f, // top left
-             1.0f,  1.0f,  0.0f, 0.0f, // top right
-            -1.0f, -1.0f,  1.0f, 0.0f, // bottom left
-             1.0f, -1.0f,  0.0f, 1.0f, // bottom right
-        };
+    void RenderScreenSpaceQuad() {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        MeshData md;
-        md.indices = { 0, 1, 2, 1, 3, 2 };
-
-        for (int i = 0; i < 6; i++) {
-            Vertex v;
-            v.position = { quadVertices[i * 4],     quadVertices[i * 4 + 1], 0 };
-            v.uv       = { quadVertices[i * 4 + 2], quadVertices[i * 4 + 3] }; 
-            md.vertices.push_back(v);
-        }
-         
-        Mesh mesh;
-        UploadMesh(mesh, md);
-
-        AssetManager::g_meshes.push_back(mesh);
-    }
-
-    void DrawQuad() {
         
     }
 
