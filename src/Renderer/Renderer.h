@@ -16,6 +16,8 @@ namespace Renderer {
 
 	void BindMaterial(const Material& material);
 
+    void CreateFramebuffer();
+
     void DrawScreenSpaceObject();
 	void RenderFrame();
 

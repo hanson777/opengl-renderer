@@ -9,6 +9,7 @@ int main() {
 
     Renderer::Init();
     Game::InitPrimitives();
+    Game::Init();
     Renderer::Upload();
 
     while (!window.ShouldClose()) {
