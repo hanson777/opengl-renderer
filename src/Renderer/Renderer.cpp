@@ -43,20 +43,20 @@ namespace Renderer {
         glGenFramebuffers(1, &g_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
-         Texture tex;
-         tex.width = 1920;
-         tex.height = 1080;
-         tex.format = GL_RGB;
-         tex.internalFormat = GL_RGB;
-         UploadTexture(tex);
-         g_textureColorbuffer = tex.id;
-
-        /*glGenTextures(1, &g_textureColorbuffer);
-        glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);*/
+        Texture tex;
+        tex.width = 1920;
+        tex.height = 1080;
+        tex.format = GL_RGB;
+        tex.internalFormat = GL_RGB;
+        UploadTexture(tex);
+        g_textureColorbuffer = tex.id;
+        
+        // glGenTextures(1, &g_textureColorbuffer);
+        // glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
+        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glBindTexture(GL_TEXTURE_2D, 0);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_textureColorbuffer, 0);
 
@@ -187,7 +187,8 @@ namespace Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+        // glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
@@ -253,13 +254,13 @@ namespace Renderer {
             }
         }
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
-        DrawScreenSpaceObject();
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // glClearColor(1, 0, 0, 1);
+        // glClear(GL_COLOR_BUFFER_BIT);
+        // glDisable(GL_DEPTH_TEST);
+        // glActiveTexture(GL_TEXTURE3);
+        // glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
+        // DrawScreenSpaceObject();
     }
 
     Shader* GetShaderByIndex(int index) {

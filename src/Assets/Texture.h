@@ -14,5 +14,5 @@ struct Texture {
     void Load(const std::string& filename);
     void GenerateWhiteTexture();
 
-    const uint8_t* GetRawData() const { return data.data(); }
+    const uint8_t* GetRawData() const { return data.empty() ? nullptr : data.data(); }
 };

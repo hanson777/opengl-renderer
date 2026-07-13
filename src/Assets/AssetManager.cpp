@@ -8,7 +8,6 @@ namespace AssetManager {
 	std::vector<Model> g_models;
 	std::vector<Mesh> g_meshes;
 	std::vector<MeshData> g_meshData;
-
 	std::vector<Mesh> g_primitiveMeshes;
     std::vector<MeshData> g_primitiveMeshData;
 
