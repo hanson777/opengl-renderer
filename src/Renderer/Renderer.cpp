@@ -24,9 +24,9 @@ namespace Renderer {
 
     void Init() {
         glEnable(GL_DEPTH_TEST);
-         glFrontFace(GL_CCW);
-         glCullFace(GL_BACK);
-         glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         CreateFramebuffer();
@@ -63,9 +63,9 @@ namespace Renderer {
         glGenRenderbuffers(1, &g_rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, g_rbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920, 1080);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, g_rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -164,32 +164,7 @@ namespace Renderer {
         }
     }
 
-    void DrawScreenSpaceObject() {
-        for (ScreenSpaceObject& ssObject : Scene::g_screenSpaceObjects) {
-            Shader* shader = Renderer::GetShaderByIndex(ssObject.shaderIndex);
-            shader->Use();
-            shader->SetInt("screenTexture", 3);
-
-            Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(ssObject.meshIndex);
-            glBindVertexArray(mesh->vao);
-
-            glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }
-    }
-
-    void RenderFrame() {
-        float currentFrame = glfwGetTime();
-        g_deltaTime = currentFrame - g_lastFrame;
-        g_lastFrame = currentFrame;
-
-        glClearColor(0, 1, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
-        // glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+    void DrawSceneObjects() {
         glm::mat4 view = Scene::g_camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(Scene::g_camera.GetFov()), 1920.0f / 1080.0f, 0.1f, 500.0f);
 
@@ -218,13 +193,14 @@ namespace Renderer {
                         shader->SetVec3("lights[" + std::to_string(i) + "].color", light.color);
                         shader->SetFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
                         shader->SetFloat("lights[" + std::to_string(i) + "].radius", light.radius);
-                    } else {
+                    }
+                    else {
                         shader->SetVec3("lights[" + std::to_string(i) + "].position", light.position);
                         shader->SetVec3("lights[" + std::to_string(i) + "].direction", light.direction);
                         shader->SetVec3("lights[" + std::to_string(i) + "].color", light.color);
                         shader->SetFloat("lights[" + std::to_string(i) + "].intensity", light.intensity);
                         shader->SetFloat("lights[" + std::to_string(i) + "].radius", light.radius);
-                    } 
+                    }
                 }
             }
 
@@ -234,7 +210,7 @@ namespace Renderer {
                 int meshIndex = model->m_meshIndices[i];
                 Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
 
-                const Material& mat = (mesh->materialId != -1) ? 
+                const Material& mat = (mesh->materialId != -1) ?
                     model->GetMaterials()[mesh->materialId] : model->GetDefaultMaterial();
 
                 BindMaterial(mat);
@@ -253,14 +229,45 @@ namespace Renderer {
                 glBindVertexArray(0);
             }
         }
+    }
 
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // glClearColor(1, 0, 0, 1);
-        // glClear(GL_COLOR_BUFFER_BIT);
-        // glDisable(GL_DEPTH_TEST);
-        // glActiveTexture(GL_TEXTURE3);
-        // glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
-        // DrawScreenSpaceObject();
+    void DrawScreenSpaceObject() {
+        for (ScreenSpaceObject& ssObject : Scene::g_screenSpaceObjects) {
+            Shader* shader = Renderer::GetShaderByIndex(ssObject.shaderIndex);
+            shader->Use();
+            shader->SetInt("screenTexture", 3);
+
+            Mesh* mesh = AssetManager::GetPrimitiveMeshByIndex(ssObject.meshIndex);
+            glBindVertexArray(mesh->vao);
+
+            glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+    }
+
+    void RenderFrame() {
+        float currentFrame = glfwGetTime();
+        g_deltaTime = currentFrame - g_lastFrame;
+        g_lastFrame = currentFrame;
+
+        glClearColor(0, 1, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+
+        DrawSceneObjects();
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glClearColor(1, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
+
+        DrawScreenSpaceObject();
     }
 
     Shader* GetShaderByIndex(int index) {

@@ -18,6 +18,7 @@ namespace Renderer {
 
     void CreateFramebuffer();
 
+	void DrawSceneObjects();
     void DrawScreenSpaceObject();
 	void RenderFrame();
 
