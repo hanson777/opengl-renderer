@@ -18,8 +18,8 @@ namespace Renderer {
     std::vector<Shader> g_shaders;
     float g_deltaTime = 0.0f;
     float g_lastFrame = 0.0f;
-    uint32_t g_fbo = 0;
-    uint32_t g_rbo = 0;
+    uint32_t g_fbo = -1;
+    uint32_t g_rbo = -1;
     uint32_t g_textureColorbuffer = -1;
 
     void Init() {
@@ -27,7 +27,7 @@ namespace Renderer {
         glFrontFace(GL_CCW);
         glCullFace(GL_BACK);
         glEnable(GL_CULL_FACE);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         CreateFramebuffer();
         g_lastFrame = glfwGetTime();
@@ -43,35 +43,26 @@ namespace Renderer {
         glGenFramebuffers(1, &g_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
-        Texture tex;
-        tex.width = 1920;
-        tex.height = 1080;
-        tex.format = GL_RGB;
-        tex.internalFormat = GL_RGB;
-        UploadTexture(tex);
-        g_textureColorbuffer = tex.id;
-        
-        // glGenTextures(1, &g_textureColorbuffer);
-        // glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
-        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // glBindTexture(GL_TEXTURE_2D, 0);
+        glGenTextures(1, &g_textureColorbuffer);
+        glBindTexture(GL_TEXTURE_2D, g_textureColorbuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_textureColorbuffer, 0);
 
         glGenRenderbuffers(1, &g_rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, g_rbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920, 1080);
-
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, g_rbo);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             std::cout << "[ERROR::RENDERER] framebuffer incomplete: " << status << std::endl;
             exit(1);
         }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void UploadMesh(Mesh& mesh, const MeshData& data) {
@@ -250,11 +241,11 @@ namespace Renderer {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;
 
+        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+
         glClearColor(0, 1, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
 
         DrawSceneObjects();
         

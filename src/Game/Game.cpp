@@ -25,6 +25,7 @@ namespace Game {
 
     void InitPrimitives() {
         int ndcIdx = Renderer::LoadShader("shaders/quad.vert", "shaders/quad.frag");
+        // int ndcIdx = Renderer::LoadShader("Shaders/ndc.vert", "shaders/ndc.frag");
 
         int quadIdx = AssetManager::LoadMeshData(MeshType::Quad);
 
