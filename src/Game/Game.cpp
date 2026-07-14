@@ -20,6 +20,23 @@ namespace Game {
         sponza.scale = glm::vec3(0.1f);
         Scene::g_sceneObjects.push_back(sponza);
 
+        int cubeIdx = AssetManager::LoadModel("res/cube/cube.obj");
+
+        SceneObject lightCube;
+        lightCube.modelIndex = cubeIdx;
+        lightCube.shaderIndex = blankIdx;
+        lightCube.scale = glm::vec3(0.25);
+        lightCube.position = glm::vec3(0, 3, 4);
+        Scene::g_sceneObjects.push_back(lightCube);
+
+        Light pointLight;
+        pointLight.type = LightType::Point;
+        pointLight.color = glm::vec3(1, 0, 0);
+        pointLight.position = lightCube.position;
+        pointLight.intensity = 0.2f;
+        pointLight.radius = 10;
+        Scene::g_lights.push_back(pointLight);
+
         Scene::g_camera = Camera(glm::vec3(0.0f, 2.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 

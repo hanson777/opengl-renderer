@@ -242,6 +242,7 @@ namespace Renderer {
         g_lastFrame = currentFrame;
 
         glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+        glViewport(0, 0, 1920, 1080);
 
         glClearColor(0, 1, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
